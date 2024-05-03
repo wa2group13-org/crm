@@ -1,0 +1,315 @@
+###THIS TESTS CAN BE RUN IN ORDER WITHOUT CHANGES STARTING FROM A CLEAN DATABASE
+### MESSAGE HTTP TEST
+###  Creating message with invalid sender: expected 400
+POST http://localhost:8080/API/messages
+Content-Type: application/json
+
+{
+  "sender": "",
+  "channel": "telephone",
+  "priority": "High",
+  "subject": "Tizio{{$random.integer(0,1000)}}",
+  "body": "{{$random.uuid}}"
+}
+
+
+### Creating message with invalid channel: expected 400
+POST http://localhost:8080/API/messages
+Content-Type: application/json
+
+{
+  "sender": "{{$random.email}}",
+  "channel": "",
+  "priority": "High",
+  "subject": "Tizio{{$random.integer(0,1000)}}",
+  "body": "{{$random.uuid}}"
+}
+
+### Creating message with valid parameters: expected 201
+POST http://localhost:8080/API/messages
+Content-Type: application/json
+
+{
+  "sender": "{{$random.email}}",
+  "channel": "Telephone",
+  "priority": "High",
+  "subject": "Tizio{{$random.integer(0,1000)}}",
+  "body": "{{$random.uuid}}"
+}
+
+### Read all messages: always 200
+GET http://localhost:8080/API/messages
+
+### Read message by invalid id: expected 400
+GET http://localhost:8080/API/messages/invalidstring
+
+### Read message by absent id: expected 404
+GET http://localhost:8080/API/messages/-1
+
+### Change message status with invalid body: expected 400
+POST http://localhost:8080/API/messages/1
+Content-Type: application/json
+
+{
+  "status": "",
+  "comment": ""
+}
+
+### Change message status with absent id: expected 404
+POST http://localhost:8080/API/messages/-1
+Content-Type: application/json
+
+{
+  "status": "Done",
+  "comment": ""
+}
+
+### Change message status with invalid new status: expected 400
+POST http://localhost:8080/API/messages/1
+Content-Type: application/json
+
+{
+  "status": "Done",
+  "comment": ""
+}
+
+### Change message status with valid new status: expected 200
+POST http://localhost:8080/API/messages/1
+Content-Type: application/json
+
+{
+  "status": "Read",
+  "comment": ""
+}
+
+### Change message priority with an absent message id: expected 404
+PUT  http://localhost:8080/API/messages/-1/priority
+Content-Type: application/json
+
+{
+  "priority": "Medium"
+}
+
+### Change message priority with an invalid priority: expected 400
+PUT  http://localhost:8080/API/messages/1/priority
+Content-Type: application/json
+
+{
+  "priority": "INVALID"
+}
+
+### Change message priority with an valid priority: expected 200
+PUT  http://localhost:8080/API/messages/1/priority
+Content-Type: application/json
+
+{
+  "priority": "Medium"
+}
+
+### Read message by id: expected 200
+GET http://localhost:8080/API/messages/1
+
+### CONTACT HTTP TEST
+### Get all contact: expected 200
+GET http://localhost:8080/API/contacts?
+    page=0&
+    limit=50
+
+###  Create contact with a missing field: expected 400
+POST http://localhost:8080/API/contacts
+Content-Type: application/json
+
+{
+  "name": "ciao",
+  "surname": "",
+  "category": "Customer",
+  "telephones": [],
+  "emails": [],
+  "addresses": []
+}
+
+###  Create contact: expected 201
+POST http://localhost:8080/API/contacts
+Content-Type: application/json
+
+{
+  "name": "name1",
+  "surname": "surname1",
+  "category": "Customer",
+  "telephones": [],
+  "emails": [],
+  "addresses": []
+}
+
+### Get all contact: expected 200
+GET http://localhost:8080/API/contacts?
+    page=0&
+    limit=50
+
+### Get contact by absent id: expected 404
+GET http://localhost:8080/API/contacts/-1
+
+### Get contact by invalid id: expected 400
+GET http://localhost:8080/API/contacts/invalidid
+
+### Get contact by id: expected 200
+GET http://localhost:8080/API/contacts/2
+
+### Update contact, absent id: expected 201
+PUT http://localhost:8080/API/contacts/-1
+Content-Type: application/json
+
+{
+  "name": "name2",
+  "surname": "surname2",
+  "category": "Customer",
+  "telephones": [],
+  "emails": [],
+  "addresses": []
+}
+
+### Get all contact: expected 200
+GET http://localhost:8080/API/contacts?
+    page=0&
+    limit=50
+
+### Update contact: expected 201
+PUT http://localhost:8080/API/contacts/2
+Content-Type: application/json
+
+{
+  "name": "rename11",
+  "surname": "surname11",
+  "category": "Customer",
+  "telephones": [],
+  "emails": [],
+  "addresses": []
+}
+
+### Delete contact by id: 204
+DELETE http://localhost:8080/API/contacts/3
+
+### Delete contact by absent id: 404
+DELETE http://localhost:8080/API/contacts/3
+
+### Get all contact: expected 200
+GET http://localhost:8080/API/contacts?
+    page=0&
+    limit=50
+
+### MESSAGE-MAIL HTTP TEST
+### Add mail to contact, absent id: 404
+POST http://localhost:8080/API/contacts/-1/emails
+Content-Type: application/json
+
+{
+  "email": "example@example.com"
+}
+
+### Add mail to contact: 200
+POST http://localhost:8080/API/contacts/4/emails
+Content-Type: application/json
+
+{
+  "email": "example@example.com"
+}
+
+### Get mails from a contact: 200
+GET http://localhost:8080/API/contacts/4/emails
+
+### Update mails from a contact: 201
+PUT http://localhost:8080/API/contacts/4/emails/1
+Content-Type: application/json
+
+{
+  "email": "example2@example.com"
+}
+
+### Delete mails from a contact: 204
+DELETE http://localhost:8080/API/contacts/4/emails/2
+
+### Delete mails from a contact, mail not found: 404
+DELETE http://localhost:8080/API/contacts/4/emails/2
+
+### MESSAGE-TELEPHON HTTP TEST
+### Add telephon to contact, absent id: 404
+POST http://localhost:8080/API/contacts/-1/telephones
+Content-Type: application/json
+
+{
+  "number": "3333333333"
+}
+
+### Add telephon to contact: 200
+POST http://localhost:8080/API/contacts/4/telephones
+Content-Type: application/json
+
+{
+  "number": "3333333333"
+}
+
+### Get telephon from a contact: 200
+GET http://localhost:8080/API/contacts/4/telephones
+
+### Update telephon from a contact: 201
+PUT http://localhost:8080/API/contacts/4/telephones/1
+Content-Type: application/json
+
+{
+  "number": "3333333334"
+}
+
+### Get telephon from a contact: 200
+GET http://localhost:8080/API/contacts/4/telephones
+
+### Delete telephon from a contact: 204
+DELETE http://localhost:8080/API/contacts/4/telephones/2
+
+### Delete telephon from a contact, telephon not found: 404
+DELETE http://localhost:8080/API/contacts/4/telephones/2
+
+### MESSAGE-ADDRESS HTTP TEST
+### Ad address to contact, absent id: 404
+POST http://localhost:8080/API/contacts/-1/addresses
+Content-Type: application/json
+
+{
+  "civic": "10",
+  "street": "test_street",
+  "city": "turin",
+  "postalCode": "10129"
+}
+
+### Add address to contact: 201
+POST http://localhost:8080/API/contacts/4/addresses
+Content-Type: application/json
+
+{
+  "civic": "10",
+  "street": "test_street",
+  "city": "turin",
+  "postalCode": "10129"
+}
+
+### Get address from a contact: 200
+GET http://localhost:8080/API/contacts/4/addresses
+
+### Update address from a contact: 201
+PUT http://localhost:8080/API/contacts/4/addresses/1
+Content-Type: application/json
+
+{
+  "civic": "42",
+  "street": "test_street2",
+  "city": "turin",
+  "postalCode": "10129"
+}
+
+### Get address from a contact: 200
+GET http://localhost:8080/API/contacts/4/addresses
+
+### Delete address from a contact: 204
+DELETE http://localhost:8080/API/contacts/4/addresses/2
+
+### Delete address from a contact, address not found: 404
+DELETE http://localhost:8080/API/contacts/4/addresses/1
