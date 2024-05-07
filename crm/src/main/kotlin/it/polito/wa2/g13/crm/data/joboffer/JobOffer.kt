@@ -1,6 +1,7 @@
 package it.polito.wa2.g13.crm.data.joboffer
 
 import it.polito.wa2.g13.crm.data.BaseEntity
+import it.polito.wa2.g13.crm.data.customer.Customer
 import jakarta.persistence.*
 import java.time.Duration
 import java.time.OffsetDateTime
@@ -18,7 +19,8 @@ enum class JobOfferStatus {
 
 @Entity
 class JobOffer(
-    var customer: String?, // TODO: link to real customer
+    @ManyToOne
+    var customer: Customer,
     var description: String? = null,
     @Enumerated(EnumType.STRING)
     var status: JobOfferStatus,
