@@ -2,7 +2,7 @@ package it.polito.wa2.g13.crm.data.contact
 
 import it.polito.wa2.g13.crm.data.BaseEntity
 import it.polito.wa2.g13.crm.data.customer.Customer
-import it.polito.wa2.g13.crm.data.Professional
+import it.polito.wa2.g13.crm.data.professional.Professional
 import it.polito.wa2.g13.crm.dtos.ContactDTO
 import it.polito.wa2.g13.crm.dtos.CreateContactDTO
 import jakarta.persistence.*
