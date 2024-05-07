@@ -18,13 +18,7 @@ class Customer(
 
     var note : String
 
-) : BaseEntity() {
-
-    fun addOffer(offer: JobOffer){
-        offer.contact = this
-        this.offers.add(offer)
-    }
-}
+) : BaseEntity()
 
 
 @Entity

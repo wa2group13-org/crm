@@ -2,6 +2,7 @@ package it.polito.wa2.g13.crm.data.contact
 
 import it.polito.wa2.g13.crm.data.BaseEntity
 import it.polito.wa2.g13.crm.data.customer.Customer
+import it.polito.wa2.g13.crm.data.Professional
 import it.polito.wa2.g13.crm.dtos.ContactDTO
 import it.polito.wa2.g13.crm.dtos.CreateContactDTO
 import jakarta.persistence.*
@@ -37,6 +38,10 @@ class Contact(
     @OneToOne(mappedBy = "contact")
     var customer : Customer?,
 
+
+    @OneToOne(mappedBy = "contact", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
+    var professional: Professional?
+
 ) : BaseEntity() {
     companion object {
         @JvmStatic
@@ -49,6 +54,7 @@ class Contact(
             emails = mutableSetOf(),
             addresses = mutableSetOf(),
             customer = null,
+            professional = null,
         )
 
         @JvmStatic
@@ -61,18 +67,20 @@ class Contact(
             emails = mutableSetOf(),
             addresses = mutableSetOf(),
             customer = null,
+            professional = null,
         )
 
         @JvmStatic
         fun createAnonymous(sender: String, channel: String): Contact {
             return Contact(
-                sender,
-                channel,
-                ContactCategory.Unknown,
-                null,
-                mutableSetOf(),
-                mutableSetOf(),
-                mutableSetOf(),
+                name = sender,
+                surname = channel,
+                category = ContactCategory.Unknown,
+                ssn =null,
+                telephones = mutableSetOf(),
+                emails = mutableSetOf(),
+                addresses = mutableSetOf(),
+                professional = null,
                 customer = null,
             )
         }
