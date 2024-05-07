@@ -23,6 +23,6 @@ class ProfessionalController(
         @RequestParam("limit") @Min(0) @Max(10) limit: Int,
         professionalFilters: ProfessionalFilters,
     ): List<ProfessionalDTO> {
-        TODO("not implemented yet!")
+        return professionalService.getProfessionals(page, limit, professionalFilters)
     }
 }

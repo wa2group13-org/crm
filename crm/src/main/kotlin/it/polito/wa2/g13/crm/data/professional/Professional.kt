@@ -1,9 +1,15 @@
 package it.polito.wa2.g13.crm.data.professional
 
 import it.polito.wa2.g13.crm.data.BaseEntity
+import it.polito.wa2.g13.crm.data.contact.Address
 import it.polito.wa2.g13.crm.data.contact.Contact
 import it.polito.wa2.g13.crm.dtos.CreateProfessionalDTO
+import it.polito.wa2.g13.crm.dtos.ProfessionalFilters
 import jakarta.persistence.*
+import jakarta.persistence.criteria.Expression
+import jakarta.persistence.criteria.Predicate
+import jakarta.persistence.criteria.Root
+import org.springframework.data.jpa.domain.Specification
 
 enum class EmploymentState {
     Employed,
@@ -26,7 +32,7 @@ class Professional(
     @OneToOne(cascade = [CascadeType.ALL], fetch = FetchType.LAZY, orphanRemoval = true)
     @JoinColumn(referencedColumnName = "id", name = "contact_id", foreignKey = ForeignKey())
     var contact: Contact,
-): BaseEntity() {
+) : BaseEntity() {
     companion object {
         @JvmStatic
         fun from(professional: CreateProfessionalDTO): Professional = Professional(
@@ -36,5 +42,74 @@ class Professional(
             notes = professional.notes,
             contact = Contact.from(professional.contact)
         )
+    }
+
+    object Spec {
+        fun withFilters(filters: ProfessionalFilters): Specification<Professional> {
+            return Specification { root, query, criteriaBuilder ->
+                val professional: Root<Professional> = root
+                val predicates: MutableList<Predicate> = mutableListOf()
+
+                // Filter by skills
+                if (filters.bySkills != null) {
+                    val predicate = professional.join<Professional, String>("skills").`in`(filters.bySkills)
+                    predicates.add(predicate)
+                }
+
+                // Filter by employmentState
+                if (filters.byEmploymentState != null) {
+                    val predicate = criteriaBuilder.equal(
+                        professional.get<EmploymentState>("employmentState"),
+                        filters.byEmploymentState
+                    )
+                    predicates.add(predicate)
+                }
+
+                // Filter by location
+                if (filters.byLocation != null) {
+                    val addressSubquery = query.subquery(Address::class.java)
+                    val address = addressSubquery.from(Address::class.java)
+                    val addressContact: Expression<Collection<Contact>> = address.get("contacts")
+
+                    val professionalContact = professional.get<Contact>("contact")
+
+                    val filterPredicates: MutableList<Predicate> = mutableListOf()
+
+                    val addFilter = { filter: String, name: String ->
+                        filterPredicates.add(
+                            criteriaBuilder.equal(address.get<String>(name), filter)
+                        )
+                    }
+
+                    filters.byLocation.byCivic?.let {
+                        addFilter(it, "civic")
+                    }
+
+                    filters.byLocation.byStreet?.let {
+                        addFilter(it, "street")
+                    }
+
+                    filters.byLocation.byCity?.let {
+                        addFilter(it, "city")
+                    }
+
+                    filters.byLocation.byPostalCode?.let {
+                        addFilter(it, "postalCode")
+                    }
+
+                    addressSubquery.select(address)
+
+                    addressSubquery.where(
+                        *filterPredicates.toTypedArray(),
+                        criteriaBuilder.isMember(professionalContact, addressContact),
+                    )
+
+                    val predicate = criteriaBuilder.exists(addressSubquery)
+                    predicates.add(predicate)
+                }
+
+                return@Specification criteriaBuilder.and(*predicates.toTypedArray())
+            }
+        }
     }
 }
