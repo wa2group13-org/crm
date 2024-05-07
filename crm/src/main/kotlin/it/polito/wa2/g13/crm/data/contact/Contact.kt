@@ -1,6 +1,7 @@
 package it.polito.wa2.g13.crm.data.contact
 
 import it.polito.wa2.g13.crm.data.BaseEntity
+import it.polito.wa2.g13.crm.data.customer.Customer
 import it.polito.wa2.g13.crm.dtos.ContactDTO
 import it.polito.wa2.g13.crm.dtos.CreateContactDTO
 import jakarta.persistence.*
@@ -32,6 +33,10 @@ class Contact(
 
     @ManyToMany(cascade = [CascadeType.ALL], fetch = FetchType.LAZY, mappedBy = "contacts")
     var addresses: MutableSet<Address>,
+
+    @OneToOne(mappedBy = "contact")
+    var customer : Customer?,
+
 ) : BaseEntity() {
     companion object {
         @JvmStatic
@@ -43,6 +48,7 @@ class Contact(
             telephones = mutableSetOf(),
             emails = mutableSetOf(),
             addresses = mutableSetOf(),
+            customer = null,
         )
 
         @JvmStatic
@@ -54,6 +60,7 @@ class Contact(
             telephones = mutableSetOf(),
             emails = mutableSetOf(),
             addresses = mutableSetOf(),
+            customer = null,
         )
 
         @JvmStatic
@@ -65,7 +72,8 @@ class Contact(
                 null,
                 mutableSetOf(),
                 mutableSetOf(),
-                mutableSetOf()
+                mutableSetOf(),
+                customer = null,
             )
         }
     }
