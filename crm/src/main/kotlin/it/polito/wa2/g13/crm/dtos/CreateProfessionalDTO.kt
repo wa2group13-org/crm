@@ -11,7 +11,8 @@ data class CreateProfessionalDTO(
     val dailyRate: Double,
     val employmentState: EmploymentState,
     @field:Size(max = 100, min = 1)
-    val skills: Set<String>,
+    @field:Valid
+    val skills: Set<CreateSkillDTO>,
     @field:NotBlank
     @field:Size(max = 255)
     val notes: String?,
@@ -23,9 +24,20 @@ data class CreateProfessionalDTO(
         fun from(professional: ProfessionalDTO): CreateProfessionalDTO = CreateProfessionalDTO(
             dailyRate = professional.dailyRate,
             employmentState = professional.employmentState,
-            skills = professional.skills,
+            skills = professional.skills.map { CreateSkillDTO.from(it) }.toSet(),
             notes = professional.notes,
             contact = CreateContactDTO.from(professional.contact),
         )
+    }
+}
+
+data class CreateSkillDTO(
+    @field:NotBlank
+    @field:Size(max = 255)
+    val skill: String,
+) {
+    companion object {
+        @JvmStatic
+        fun from(skill: String): CreateSkillDTO = CreateSkillDTO(skill = skill)
     }
 }

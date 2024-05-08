@@ -7,6 +7,8 @@ import it.polito.wa2.g13.crm.services.ProfessionalService
 import it.polito.wa2.g13.crm.utils.assertRecursive
 import it.polito.wa2.g13.crm.utils.randomProfessional
 import it.polito.wa2.g13.crm.utils.randomProfessionals
+import org.assertj.core.api.Assertions
+import org.assertj.core.api.recursive.comparison.RecursiveComparisonConfiguration
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -157,5 +159,45 @@ class ProfessionalControllerTest : IntegrationTest() {
             .body
 
         assertRecursive(newProfessional, createdProfessional?.let { CreateProfessionalDTO.from(it) })
+    }
+
+    @Test
+    fun `update a professional fields should succeed`() {
+        val id = professionalIds.first()
+        val newProfessional = randomProfessional(5)
+
+        restClient.exchange<Any>(
+            RequestEntity.put("/API/professionals/$id/notes").body(newProfessional.notes ?: "")
+        )
+
+        restClient.exchange<Any>(
+            RequestEntity.put("/API/professionals/$id/skills").body(newProfessional.skills)
+        )
+
+        restClient.exchange<Any>(
+            RequestEntity.put("/API/professionals/$id/employmentState").body(newProfessional.employmentState)
+        )
+
+        restClient.exchange<Any>(
+            RequestEntity.put("/API/professionals/$id/dailyRate").body(newProfessional.dailyRate)
+        )
+
+        logger.info("Get the final Professional@$id, the contact will be excluded")
+
+        val updatedProfessional = restClient
+            .exchange<ProfessionalDTO>(
+                RequestEntity.get("/API/professionals/$id").build()
+            )
+            .body
+
+        Assertions.assertThat(updatedProfessional?.let { CreateProfessionalDTO.from(it) })
+            .usingRecursiveComparison(
+                RecursiveComparisonConfiguration
+                    .builder()
+                    .withIgnoreCollectionOrder(true)
+                    .build()
+            )
+            .ignoringFields("contact")
+            .isEqualTo(newProfessional)
     }
 }

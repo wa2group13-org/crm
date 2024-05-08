@@ -30,7 +30,7 @@ class Professional(
     var notes: String?,
 
     // TODO: brendon -> rivedere i cascade types, problemi con le transazioni
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(referencedColumnName = "id", name = "contact_id", foreignKey = ForeignKey())
     var contact: Contact,
 ) : BaseEntity() {
@@ -39,7 +39,7 @@ class Professional(
         fun from(professional: CreateProfessionalDTO, contact: Contact): Professional = Professional(
             employmentState = professional.employmentState,
             dailyRate = professional.dailyRate,
-            skills = professional.skills.toMutableSet(),
+            skills = professional.skills.map { it.skill }.toMutableSet(),
             notes = professional.notes,
             contact = contact,
         ).apply {

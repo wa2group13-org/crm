@@ -67,7 +67,8 @@ fun randomMessages(n: Int) = generateSequence {
 
 fun randomProfessional(randomRelations: Int?): CreateProfessionalDTO = CreateProfessionalDTO(
     notes = UUID.randomUUID().toString(),
-    skills = randomRelations?.let { (0..it).map { UUID.randomUUID().toString() }.toSet() } ?: setOf(),
+    skills = randomRelations?.let { (0..it).map { CreateSkillDTO.from(UUID.randomUUID().toString()) }.toSet() }
+        ?: setOf(),
     employmentState = EmploymentState.entries.toTypedArray().random(),
     dailyRate = Random.nextDouble(0.0, 1e10),
     contact = randomContacts(1, randomRelations)[0],

@@ -1,13 +1,14 @@
 package it.polito.wa2.g13.crm.controllers
 
+import it.polito.wa2.g13.crm.data.professional.EmploymentState
 import it.polito.wa2.g13.crm.dtos.CreateProfessionalDTO
+import it.polito.wa2.g13.crm.dtos.CreateSkillDTO
 import it.polito.wa2.g13.crm.dtos.ProfessionalDTO
 import it.polito.wa2.g13.crm.dtos.ProfessionalFilters
 import it.polito.wa2.g13.crm.exceptions.ProfessionalException
 import it.polito.wa2.g13.crm.services.ProfessionalService
 import jakarta.validation.Valid
-import jakarta.validation.constraints.Max
-import jakarta.validation.constraints.Min
+import jakarta.validation.constraints.*
 import org.springframework.http.ResponseEntity
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
@@ -62,5 +63,39 @@ class ProfessionalController(
     @Throws(ProfessionalException::class)
     fun deleteProfessional(@PathVariable("id") id: Long) {
         professionalService.deleteProfessional(id)
+    }
+
+    @PutMapping("/{id}/notes")
+    @Throws(ProfessionalException::class)
+    fun updateProfessionalNotes(
+        @PathVariable("id") id: Long,
+        @RequestBody @Valid @Size(max = 255) notes: String
+    ) {
+        return professionalService.updateProfessionalNotes(id, notes)
+    }
+
+    @PutMapping("/{id}/employmentState")
+    @Throws(ProfessionalException::class)
+    fun updateProfessionalEmploymentState(
+        @PathVariable("id") id: Long,
+        @RequestBody employmentState: EmploymentState,
+    ) {
+        return professionalService.updateProfessionalEmploymentState(id, employmentState)
+    }
+
+    @PutMapping("/{id}/dailyRate")
+    fun updateProfessionalDailyRate(
+        @PathVariable("id") id: Long,
+        @RequestBody @DecimalMin("0.0") dailyRate: Double,
+    ) {
+        return professionalService.updateProfessionalDailyRate(id, dailyRate)
+    }
+
+    @PutMapping("/{id}/skills")
+    fun updateProfessionalSkills(
+        @PathVariable("id") id: Long,
+        @RequestBody @Valid skills: Set<CreateSkillDTO>,
+    ) {
+        return professionalService.updateProfessionalSkills(id, skills)
     }
 }

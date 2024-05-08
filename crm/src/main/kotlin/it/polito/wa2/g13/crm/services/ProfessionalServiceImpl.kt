@@ -1,7 +1,9 @@
 package it.polito.wa2.g13.crm.services
 
+import it.polito.wa2.g13.crm.data.professional.EmploymentState
 import it.polito.wa2.g13.crm.data.professional.Professional
 import it.polito.wa2.g13.crm.dtos.CreateProfessionalDTO
+import it.polito.wa2.g13.crm.dtos.CreateSkillDTO
 import it.polito.wa2.g13.crm.dtos.ProfessionalDTO
 import it.polito.wa2.g13.crm.dtos.ProfessionalFilters
 import it.polito.wa2.g13.crm.exceptions.ProfessionalException
@@ -85,5 +87,41 @@ class ProfessionalServiceImpl(
             throw ProfessionalException.NotFound.from(id)
 
         professionalRepository.deleteById(id)
+    }
+
+    override fun updateProfessionalNotes(id: Long, notesDto: String) {
+        val professional =
+            professionalRepository.findById(id).nullable() ?: throw ProfessionalException.NotFound.from(id)
+
+        professional.notes = notesDto
+
+        professionalRepository.save(professional)
+    }
+
+    override fun updateProfessionalEmploymentState(id: Long, employmentState: EmploymentState) {
+        val professional =
+            professionalRepository.findById(id).nullable() ?: throw ProfessionalException.NotFound.from(id)
+
+        professional.employmentState = employmentState
+
+        professionalRepository.save(professional)
+    }
+
+    override fun updateProfessionalDailyRate(id: Long, dailyRate: Double) {
+        val professional =
+            professionalRepository.findById(id).nullable() ?: throw ProfessionalException.NotFound.from(id)
+
+        professional.dailyRate = dailyRate
+
+        professionalRepository.save(professional)
+    }
+
+    override fun updateProfessionalSkills(id: Long, skillsDto: Set<CreateSkillDTO>) {
+        val professional =
+            professionalRepository.findById(id).nullable() ?: throw ProfessionalException.NotFound.from(id)
+
+        professional.skills = skillsDto.map { it.skill }.toMutableSet()
+
+        professionalRepository.save(professional)
     }
 }
