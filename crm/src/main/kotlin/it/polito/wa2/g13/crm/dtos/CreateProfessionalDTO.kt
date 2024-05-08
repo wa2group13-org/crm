@@ -17,4 +17,15 @@ data class CreateProfessionalDTO(
     val notes: String?,
     @field:Valid
     val contact: CreateContactDTO,
-)
+) {
+    companion object {
+        @JvmStatic
+        fun from(professional: ProfessionalDTO): CreateProfessionalDTO = CreateProfessionalDTO(
+            dailyRate = professional.dailyRate,
+            employmentState = professional.employmentState,
+            skills = professional.skills,
+            notes = professional.notes,
+            contact = CreateContactDTO.from(professional.contact),
+        )
+    }
+}

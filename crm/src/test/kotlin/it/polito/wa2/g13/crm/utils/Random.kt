@@ -2,6 +2,7 @@ package it.polito.wa2.g13.crm.utils
 
 import it.polito.wa2.g13.crm.data.contact.ContactCategory
 import it.polito.wa2.g13.crm.data.message.Priority
+import it.polito.wa2.g13.crm.data.professional.EmploymentState
 import it.polito.wa2.g13.crm.dtos.*
 import java.util.*
 import kotlin.random.Random
@@ -64,3 +65,15 @@ fun randomMessages(n: Int) = generateSequence {
     randomMessage(null, null)
 }.take(n).toList()
 
+fun randomProfessional(randomRelations: Int?): CreateProfessionalDTO = CreateProfessionalDTO(
+    notes = UUID.randomUUID().toString(),
+    skills = randomRelations?.let { (0..it).map { UUID.randomUUID().toString() }.toSet() } ?: setOf(),
+    employmentState = EmploymentState.entries.toTypedArray().random(),
+    dailyRate = Random.nextDouble(0.0, 1e10),
+    contact = randomContacts(1, randomRelations)[0],
+)
+
+fun randomProfessionals(n: Int, randomRelations: Int?): List<CreateProfessionalDTO> =
+    generateSequence { randomProfessional(randomRelations) }
+        .take(n)
+        .toList()
