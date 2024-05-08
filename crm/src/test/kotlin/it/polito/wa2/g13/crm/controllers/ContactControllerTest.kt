@@ -91,7 +91,7 @@ class ContactControllerTest : IntegrationTest() {
 
         val updateRes = restClient.exchange<Unit>(
             RequestEntity
-                .put("/API/contacts/${contactToUpdate.id}")
+                .put("/API/contacts/-1")
                 .body(newContact, CreateContactDTO::class.java)
         )
 

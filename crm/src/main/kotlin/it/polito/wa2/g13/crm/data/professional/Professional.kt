@@ -29,7 +29,8 @@ class Professional(
 
     var notes: String?,
 
-    @OneToOne(cascade = [CascadeType.ALL], fetch = FetchType.LAZY, orphanRemoval = true)
+    // TODO: brendon -> rivedere i cascade types, problemi con le transazioni
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(referencedColumnName = "id", name = "contact_id", foreignKey = ForeignKey())
     var contact: Contact,
 ) : BaseEntity() {
