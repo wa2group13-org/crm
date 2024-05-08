@@ -462,19 +462,15 @@ class ContactServiceImpl(
     }
 
     override fun updateContact(contactId: Long, contactDto: CreateContactDTO): Long? {
-        val contact = contactRepository.findById(contactId).nullable()
-
-        // Delete a contact if it exists and then replace it
-        if (contact != null) {
-            contactRepository.delete(contact)
-            logger.info("updateContact: Deleted Contact@$contactId")
-        }
-
+        val contact = contactRepository.findById(contactId).nullable() ?: return createContact(contactDto)
         val newContact = createContactEntity(contactDto)
 
-        return contactRepository.save(newContact).let {
-            logger.info("updateContact: Create Contact@$contactId")
-            it.id
-        }
+        contact.update(newContact)
+
+        contactRepository.save(newContact)
+
+        logger.info("updateContact: Updated Contact@$contactId")
+
+        return null
     }
 }
