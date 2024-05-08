@@ -12,7 +12,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
 import java.net.URI
-import kotlin.jvm.Throws
+import kotlin.Throws
 
 @RestController
 @RequestMapping("/API/professionals")
@@ -56,5 +56,11 @@ class ProfessionalController(
         } else {
             ResponseEntity.noContent().build()
         }
+    }
+
+    @DeleteMapping("/{id}")
+    @Throws(ProfessionalException::class)
+    fun deleteProfessional(@PathVariable("id") id: Long) {
+        professionalService.deleteProfessional(id)
     }
 }

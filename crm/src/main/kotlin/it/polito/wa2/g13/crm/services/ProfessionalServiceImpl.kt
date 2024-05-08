@@ -67,9 +67,9 @@ class ProfessionalServiceImpl(
 
         // Update the contact using its service
         val newId = contactService.updateContact(professional.contact.id, professionalDto.contact)
-        val contact = contactRepository.findById(newId ?: professional.contact.id).nullable()!!
+        assert(newId == null)
 
-        val newProfessional = Professional.from(professionalDto, contact)
+        val newProfessional = Professional.from(professionalDto, professional.contact)
 
         professional.update(newProfessional)
 
@@ -78,5 +78,12 @@ class ProfessionalServiceImpl(
         logger.info("${::updateProfessional.name}: Updated Professional@${id}")
 
         return null
+    }
+
+    override fun deleteProfessional(id: Long) {
+        if (!professionalRepository.existsById(id))
+            throw ProfessionalException.NotFound.from(id)
+
+        professionalRepository.deleteById(id)
     }
 }
