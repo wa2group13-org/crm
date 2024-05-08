@@ -1,21 +1,13 @@
 package it.polito.wa2.g13.crm.controllers
 
 import it.polito.wa2.g13.crm.IntegrationTest
-import it.polito.wa2.g13.crm.dtos.ContactDTO
-import it.polito.wa2.g13.crm.dtos.CreateContactDTO
-import it.polito.wa2.g13.crm.dtos.CreateEmailDTO
-import it.polito.wa2.g13.crm.dtos.EmailDTO
-import it.polito.wa2.g13.crm.repositories.AddressRepository
-import it.polito.wa2.g13.crm.repositories.ContactRepository
-import it.polito.wa2.g13.crm.repositories.EmailRepository
-import it.polito.wa2.g13.crm.repositories.TelephoneRepository
+import it.polito.wa2.g13.crm.dtos.*
 import it.polito.wa2.g13.crm.services.ContactService
 import it.polito.wa2.g13.crm.services.ContactServiceImplTest
 import it.polito.wa2.g13.crm.utils.randomContacts
 import it.polito.wa2.g13.crm.utils.randomEmails
 import org.assertj.core.api.Assertions
 import org.assertj.core.api.recursive.comparison.RecursiveComparisonConfiguration
-import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -81,12 +73,6 @@ class ContactControllerTest : IntegrationTest() {
 
     @Test
     fun `update should create a new entity if it doesn't exist`() {
-        val contactToUpdate = restClient.exchange<List<ContactDTO>>(
-            RequestEntity
-                .get("/API/contacts?page=0&limit=1")
-                .build()
-        ).body!!.first()
-
         val newContact = randomContacts(1, 4)[0]
 
         val updateRes = restClient.exchange<Unit>(
