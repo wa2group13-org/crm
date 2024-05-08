@@ -98,4 +98,12 @@ class ProfessionalController(
     ) {
         return professionalService.updateProfessionalSkills(id, skills)
     }
+
+    @PutMapping("/{id}/contact")
+    fun updateProfessionalContact(
+        @PathVariable("id") id: Long,
+        @RequestBody contactId: Long,
+    ) {
+        return professionalService.updateProfessionalContact(id, contactId)
+    }
 }

@@ -16,8 +16,7 @@ data class CreateProfessionalDTO(
     @field:NotBlank
     @field:Size(max = 255)
     val notes: String?,
-    @field:Valid
-    val contact: CreateContactDTO,
+    val contactId: Long,
 ) {
     companion object {
         @JvmStatic
@@ -26,7 +25,7 @@ data class CreateProfessionalDTO(
             employmentState = professional.employmentState,
             skills = professional.skills.map { CreateSkillDTO.from(it) }.toSet(),
             notes = professional.notes,
-            contact = CreateContactDTO.from(professional.contact),
+            contactId = professional.contact.id,
         )
     }
 }

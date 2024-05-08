@@ -32,4 +32,6 @@ interface ProfessionalService {
 
     @Throws(ProfessionalException.NotFound::class)
     fun updateProfessionalSkills(id: Long, skillsDto: Set<CreateSkillDTO>)
+
+    fun updateProfessionalContact(id: Long, contactId: Long)
 }

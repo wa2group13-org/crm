@@ -6,6 +6,7 @@ import it.polito.wa2.g13.crm.dtos.CreateProfessionalDTO
 import it.polito.wa2.g13.crm.dtos.CreateSkillDTO
 import it.polito.wa2.g13.crm.dtos.ProfessionalDTO
 import it.polito.wa2.g13.crm.dtos.ProfessionalFilters
+import it.polito.wa2.g13.crm.exceptions.ContactException
 import it.polito.wa2.g13.crm.exceptions.ProfessionalException
 import it.polito.wa2.g13.crm.repositories.ContactRepository
 import it.polito.wa2.g13.crm.repositories.ProfessionalRepository
@@ -19,7 +20,6 @@ import org.springframework.transaction.annotation.Transactional
 @Transactional
 class ProfessionalServiceImpl(
     val professionalRepository: ProfessionalRepository,
-    val contactService: ContactService,
     val contactRepository: ContactRepository,
 ) : ProfessionalService {
     companion object {
@@ -27,8 +27,10 @@ class ProfessionalServiceImpl(
     }
 
     private fun createProfessionalEntity(professionalDto: CreateProfessionalDTO): Professional {
-        val contactId = contactService.createContact(professionalDto.contact)
-        val contact = contactRepository.findById(contactId).nullable()!!
+        val contact =
+            contactRepository.findById(professionalDto.contactId).nullable() ?: throw ContactException.NotFound.from(
+                professionalDto.contactId
+            )
 
         return Professional.from(professionalDto, contact)
     }
@@ -67,11 +69,7 @@ class ProfessionalServiceImpl(
     override fun updateProfessional(id: Long, professionalDto: CreateProfessionalDTO): Long? {
         val professional = professionalRepository.findById(id).nullable() ?: return createProfessional(professionalDto)
 
-        // Update the contact using its service
-        val newId = contactService.updateContact(professional.contact.id, professionalDto.contact)
-        assert(newId == null)
-
-        val newProfessional = Professional.from(professionalDto, professional.contact)
+        val newProfessional = createProfessionalEntity(professionalDto)
 
         professional.update(newProfessional)
 
@@ -121,6 +119,18 @@ class ProfessionalServiceImpl(
             professionalRepository.findById(id).nullable() ?: throw ProfessionalException.NotFound.from(id)
 
         professional.skills = skillsDto.map { it.skill }.toMutableSet()
+
+        professionalRepository.save(professional)
+    }
+
+    override fun updateProfessionalContact(id: Long, contactId: Long) {
+        val professional =
+            professionalRepository.findById(id).nullable() ?: throw ProfessionalException.NotFound.from(id)
+
+        val contact =
+            contactRepository.findById(contactId).nullable() ?: throw ContactException.NotFound.from(contactId)
+
+        professional.contact = contact
 
         professionalRepository.save(professional)
     }

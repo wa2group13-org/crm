@@ -65,16 +65,15 @@ fun randomMessages(n: Int) = generateSequence {
     randomMessage(null, null)
 }.take(n).toList()
 
-fun randomProfessional(randomRelations: Int?): CreateProfessionalDTO = CreateProfessionalDTO(
+fun randomProfessional(contactId: Long, randomRelations: Int?): CreateProfessionalDTO = CreateProfessionalDTO(
     notes = UUID.randomUUID().toString(),
     skills = randomRelations?.let { (0..it).map { CreateSkillDTO.from(UUID.randomUUID().toString()) }.toSet() }
         ?: setOf(),
     employmentState = EmploymentState.entries.toTypedArray().random(),
     dailyRate = Random.nextDouble(0.0, 1e10),
-    contact = randomContacts(1, randomRelations)[0],
+    contactId = contactId,
 )
 
-fun randomProfessionals(n: Int, randomRelations: Int?): List<CreateProfessionalDTO> =
-    generateSequence { randomProfessional(randomRelations) }
-        .take(n)
-        .toList()
+fun randomProfessionals(contactIds: List<Long>, randomRelations: Int?): List<CreateProfessionalDTO> = contactIds
+    .map { randomProfessional(it, randomRelations) }
+    .toList()

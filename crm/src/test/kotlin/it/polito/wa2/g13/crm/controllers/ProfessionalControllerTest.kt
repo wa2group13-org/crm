@@ -1,14 +1,12 @@
 package it.polito.wa2.g13.crm.controllers
 
 import it.polito.wa2.g13.crm.IntegrationTest
+import it.polito.wa2.g13.crm.dtos.CreateContactDTO
 import it.polito.wa2.g13.crm.dtos.CreateProfessionalDTO
 import it.polito.wa2.g13.crm.dtos.ProfessionalDTO
+import it.polito.wa2.g13.crm.services.ContactService
 import it.polito.wa2.g13.crm.services.ProfessionalService
-import it.polito.wa2.g13.crm.utils.assertRecursive
-import it.polito.wa2.g13.crm.utils.randomProfessional
-import it.polito.wa2.g13.crm.utils.randomProfessionals
-import org.assertj.core.api.Assertions
-import org.assertj.core.api.recursive.comparison.RecursiveComparisonConfiguration
+import it.polito.wa2.g13.crm.utils.*
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -25,24 +23,42 @@ import org.springframework.test.context.jdbc.Sql
 class ProfessionalControllerTest : IntegrationTest() {
     companion object {
         private val logger = LoggerFactory.getLogger(ProfessionalController::class.java)
-
-        private val professionals = randomProfessionals(1, 0)
-        private var professionalIds = mutableListOf<Long>()
     }
+
+    @Autowired
+    private lateinit var contactService: ContactService
 
     @Autowired
     private lateinit var professionalService: ProfessionalService
 
+    private val contacts = randomContacts(10, 5)
+    private val professionals = mutableListOf<CreateProfessionalDTO>()
+    private val professionalIds = mutableListOf<Long>()
+
     @BeforeEach
     fun createDb() {
-        professionalIds = mutableListOf()
-        professionals.forEach {
-            val id = professionalService.createProfessional(it)
+        professionalIds.clear()
+        professionals.clear()
+
+        contacts.forEach { contact ->
+            val contactId = contactService.createContact(contact)
+
+            val professional = randomProfessional(contactId, 5)
+            professionals.add(professional)
+
+            val id = professionalService.createProfessional(professional)
             professionalIds.add(id)
         }
 
         logger.info("Initialized DB")
     }
+
+    fun newProfessional(): Pair<CreateProfessionalDTO, CreateContactDTO> {
+        val contact = randomContacts(1, 5)[0]
+        val contactId = contactService.createContact(contact)
+        return Pair(randomProfessional(contactId, 5), contact)
+    }
+
 
     @Autowired
     private lateinit var restClient: TestRestTemplate
@@ -81,7 +97,7 @@ class ProfessionalControllerTest : IntegrationTest() {
 
     @Test
     fun `a created professional should be retrievable by id`() {
-        val professional = randomProfessional(5)
+        val (professional, _) = newProfessional()
 
         val professionalId = restClient
             .exchange<Unit>(
@@ -119,13 +135,11 @@ class ProfessionalControllerTest : IntegrationTest() {
     @Test
     fun `update professional should succeed`() {
         val id = professionalIds.first()
-        val newProfessional = randomProfessional(5)
+        val (newProfessional, _) = newProfessional()
 
         val res = restClient.exchange<Unit>(
             RequestEntity.put("/API/professionals/$id").body(newProfessional, CreateProfessionalDTO::class.java)
         )
-
-        println(res)
 
         assertTrue(res.statusCode.is2xxSuccessful)
 
@@ -133,14 +147,12 @@ class ProfessionalControllerTest : IntegrationTest() {
             .exchange<ProfessionalDTO>(RequestEntity.get("/API/professionals/$id").build())
             .body!!
 
-        println(updateProfessional)
-
         assertRecursive(newProfessional, CreateProfessionalDTO.from(updateProfessional))
     }
 
     @Test
     fun `updating a professional that doesn't exist should create a new one`() {
-        val newProfessional = randomProfessional(5)
+        val (newProfessional, _) = newProfessional()
         val newId = restClient
             .exchange<Unit>(
                 RequestEntity.put("/API/professionals/-1").body(newProfessional, CreateProfessionalDTO::class.java)
@@ -164,7 +176,7 @@ class ProfessionalControllerTest : IntegrationTest() {
     @Test
     fun `update a professional fields should succeed`() {
         val id = professionalIds.first()
-        val newProfessional = randomProfessional(5)
+        val (newProfessional, _) = newProfessional()
 
         restClient.exchange<Any>(
             RequestEntity.put("/API/professionals/$id/notes").body(newProfessional.notes ?: "")
@@ -182,6 +194,10 @@ class ProfessionalControllerTest : IntegrationTest() {
             RequestEntity.put("/API/professionals/$id/dailyRate").body(newProfessional.dailyRate)
         )
 
+        restClient.exchange<Any>(
+            RequestEntity.put("/API/professionals/$id/contact").body(newProfessional.contactId)
+        )
+
         logger.info("Get the final Professional@$id, the contact will be excluded")
 
         val updatedProfessional = restClient
@@ -190,14 +206,6 @@ class ProfessionalControllerTest : IntegrationTest() {
             )
             .body
 
-        Assertions.assertThat(updatedProfessional?.let { CreateProfessionalDTO.from(it) })
-            .usingRecursiveComparison(
-                RecursiveComparisonConfiguration
-                    .builder()
-                    .withIgnoreCollectionOrder(true)
-                    .build()
-            )
-            .ignoringFields("contact")
-            .isEqualTo(newProfessional)
+        assertRecursive(newProfessional, updatedProfessional?.let { CreateProfessionalDTO.from(it) })
     }
 }
