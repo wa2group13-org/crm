@@ -1,7 +1,7 @@
 package it.polito.wa2.g13.crm.data.joboffer
 
 import it.polito.wa2.g13.crm.data.BaseEntity
-import it.polito.wa2.g13.crm.data.Professional
+import it.polito.wa2.g13.crm.data.professional.Professional
 import jakarta.persistence.*
 import java.time.OffsetDateTime
 
