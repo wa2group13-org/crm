@@ -2,7 +2,7 @@ package it.polito.wa2.g13.crm.data.contact
 
 import it.polito.wa2.g13.crm.data.BaseEntity
 import it.polito.wa2.g13.crm.data.customer.Customer
-import it.polito.wa2.g13.crm.data.Professional
+import it.polito.wa2.g13.crm.data.professional.Professional
 import it.polito.wa2.g13.crm.dtos.ContactDTO
 import it.polito.wa2.g13.crm.dtos.CreateContactDTO
 import jakarta.persistence.*
@@ -36,10 +36,9 @@ class Contact(
     var addresses: MutableSet<Address>,
 
     @OneToOne(mappedBy = "contact")
-    var customer : Customer?,
+    var customer: Customer?,
 
-
-    @OneToOne(mappedBy = "contact", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
+    @OneToOne(mappedBy = "contact", fetch = FetchType.LAZY)
     var professional: Professional?
 
 ) : BaseEntity() {
@@ -76,7 +75,7 @@ class Contact(
                 name = sender,
                 surname = channel,
                 category = ContactCategory.Unknown,
-                ssn =null,
+                ssn = null,
                 telephones = mutableSetOf(),
                 emails = mutableSetOf(),
                 addresses = mutableSetOf(),
@@ -150,6 +149,11 @@ class Contact(
         this.surname = other.surname
         this.category = other.category
         this.ssn = other.ssn
+        this.telephones = other.telephones.onEach { telephone -> telephone.contacts.add(this@Contact) }
+        this.emails = other.emails.onEach { email -> email.contacts.add(this@Contact) }
+        this.addresses = other.addresses.onEach { address -> address.contacts.add(this@Contact) }
+        this.customer = other.customer?.apply { this.contact = this@Contact }
+        this.professional = other.professional?.apply { this.contact = this@Contact }
     }
 
     fun isAnonymous(): Boolean {

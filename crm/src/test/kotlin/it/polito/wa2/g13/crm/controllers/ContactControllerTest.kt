@@ -1,21 +1,13 @@
 package it.polito.wa2.g13.crm.controllers
 
 import it.polito.wa2.g13.crm.IntegrationTest
-import it.polito.wa2.g13.crm.dtos.ContactDTO
-import it.polito.wa2.g13.crm.dtos.CreateContactDTO
-import it.polito.wa2.g13.crm.dtos.CreateEmailDTO
-import it.polito.wa2.g13.crm.dtos.EmailDTO
-import it.polito.wa2.g13.crm.repositories.AddressRepository
-import it.polito.wa2.g13.crm.repositories.ContactRepository
-import it.polito.wa2.g13.crm.repositories.EmailRepository
-import it.polito.wa2.g13.crm.repositories.TelephoneRepository
+import it.polito.wa2.g13.crm.dtos.*
 import it.polito.wa2.g13.crm.services.ContactService
 import it.polito.wa2.g13.crm.services.ContactServiceImplTest
 import it.polito.wa2.g13.crm.utils.randomContacts
 import it.polito.wa2.g13.crm.utils.randomEmails
 import org.assertj.core.api.Assertions
 import org.assertj.core.api.recursive.comparison.RecursiveComparisonConfiguration
-import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -25,8 +17,10 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.client.TestRestTemplate
 import org.springframework.boot.test.web.client.exchange
 import org.springframework.http.RequestEntity
+import org.springframework.test.context.jdbc.Sql
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@Sql(scripts = ["/scripts/clean_db.sql"], executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
 class ContactControllerTest : IntegrationTest() {
     companion object {
         private val logger = LoggerFactory.getLogger(ContactServiceImplTest::class.java)
@@ -35,34 +29,10 @@ class ContactControllerTest : IntegrationTest() {
 
     }
 
-    @Autowired
-    private lateinit var contactRepository: ContactRepository
-
-    @Autowired
-    private lateinit var emailRepository: EmailRepository
-
-    @Autowired
-    private lateinit var telephoneRepository: TelephoneRepository
-
-    @Autowired
-    private lateinit var addressRepository: AddressRepository
-
-    private fun cleanup() {
-        contactRepository.deleteAll()
-        emailRepository.deleteAll()
-        telephoneRepository.deleteAll()
-        addressRepository.deleteAll()
-    }
-
     @BeforeEach
     fun setupDatabase(@Autowired contactService: ContactService) {
         contacts.forEach { contactService.createContact(it) }
         logger.info("Created contacts for integration test")
-    }
-
-    @AfterEach
-    fun cleanupDatabase(@Autowired contactService: ContactService) {
-        cleanup()
     }
 
     @Autowired
@@ -103,17 +73,11 @@ class ContactControllerTest : IntegrationTest() {
 
     @Test
     fun `update should create a new entity if it doesn't exist`() {
-        val contactToUpdate = restClient.exchange<List<ContactDTO>>(
-            RequestEntity
-                .get("/API/contacts?page=0&limit=1")
-                .build()
-        ).body!!.first()
-
         val newContact = randomContacts(1, 4)[0]
 
         val updateRes = restClient.exchange<Unit>(
             RequestEntity
-                .put("/API/contacts/${contactToUpdate.id}")
+                .put("/API/contacts/-1")
                 .body(newContact, CreateContactDTO::class.java)
         )
 

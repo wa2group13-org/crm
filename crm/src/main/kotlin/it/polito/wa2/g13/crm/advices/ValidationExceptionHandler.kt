@@ -1,4 +1,4 @@
-package it.polito.wa2.g13.crm.advice
+package it.polito.wa2.g13.crm.advices
 
 import jakarta.validation.ConstraintViolationException
 import org.springframework.http.HttpStatus
