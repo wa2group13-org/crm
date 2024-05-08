@@ -24,7 +24,7 @@ class Professional(
 
     var dailyRate: Double,
 
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     var skills: MutableSet<String>,
 
     var notes: String?,
@@ -35,13 +35,15 @@ class Professional(
 ) : BaseEntity() {
     companion object {
         @JvmStatic
-        fun from(professional: CreateProfessionalDTO): Professional = Professional(
+        fun from(professional: CreateProfessionalDTO, contact: Contact): Professional = Professional(
             employmentState = professional.employmentState,
             dailyRate = professional.dailyRate,
             skills = professional.skills.toMutableSet(),
             notes = professional.notes,
-            contact = Contact.from(professional.contact)
-        )
+            contact = contact,
+        ).apply {
+            contact.professional = this
+        }
     }
 
     object Spec {
@@ -111,5 +113,13 @@ class Professional(
                 return@Specification criteriaBuilder.and(*predicates.toTypedArray())
             }
         }
+    }
+
+    fun update(professional: Professional) {
+        employmentState = professional.employmentState
+        dailyRate = professional.dailyRate
+        skills = professional.skills
+        notes = professional.notes
+        contact = professional.contact.apply { this.professional = this@Professional }
     }
 }
