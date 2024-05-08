@@ -25,8 +25,10 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.client.TestRestTemplate
 import org.springframework.boot.test.web.client.exchange
 import org.springframework.http.RequestEntity
+import org.springframework.test.context.jdbc.Sql
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@Sql(scripts = ["/scripts/clean_db.sql"], executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
 class ContactControllerTest : IntegrationTest() {
     companion object {
         private val logger = LoggerFactory.getLogger(ContactServiceImplTest::class.java)
@@ -35,34 +37,10 @@ class ContactControllerTest : IntegrationTest() {
 
     }
 
-    @Autowired
-    private lateinit var contactRepository: ContactRepository
-
-    @Autowired
-    private lateinit var emailRepository: EmailRepository
-
-    @Autowired
-    private lateinit var telephoneRepository: TelephoneRepository
-
-    @Autowired
-    private lateinit var addressRepository: AddressRepository
-
-    private fun cleanup() {
-        contactRepository.deleteAll()
-        emailRepository.deleteAll()
-        telephoneRepository.deleteAll()
-        addressRepository.deleteAll()
-    }
-
     @BeforeEach
     fun setupDatabase(@Autowired contactService: ContactService) {
         contacts.forEach { contactService.createContact(it) }
         logger.info("Created contacts for integration test")
-    }
-
-    @AfterEach
-    fun cleanupDatabase(@Autowired contactService: ContactService) {
-        cleanup()
     }
 
     @Autowired
