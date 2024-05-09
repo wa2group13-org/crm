@@ -1,4 +1,5 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.springframework.boot.gradle.tasks.bundling.BootBuildImage
 
 plugins {
 	id("idea")
@@ -26,6 +27,22 @@ idea {
 
 repositories {
 	mavenCentral()
+}
+
+tasks {
+	bootRun {
+		environment["SPRING_PROFILES_ACTIVE"] = "dev"
+	}
+}
+
+tasks.named<BootBuildImage>("bootBuildImage") {
+	imageName = "${System.getenv("DOCKER_USERNAME")}/${project.name}:${project.version}"
+	docker {
+		publishRegistry {
+			username = System.getenv("DOCKER_USERNAME")
+			password = System.getenv("DOCKER_PASSWORD")
+		}
+	}
 }
 
 dependencies {
