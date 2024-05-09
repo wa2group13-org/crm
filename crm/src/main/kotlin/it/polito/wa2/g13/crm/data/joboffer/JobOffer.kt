@@ -4,7 +4,7 @@ import it.polito.wa2.g13.crm.data.BaseEntity
 import it.polito.wa2.g13.crm.data.customer.Customer
 import it.polito.wa2.g13.crm.data.professional.Professional
 import it.polito.wa2.g13.crm.dtos.JobOfferFilters
-import it.polito.wa2.g13.crm.dtos.UpdateJobOfferDTO
+import it.polito.wa2.g13.crm.dtos.UpdateJobOfferDetailsDTO
 import jakarta.persistence.*
 import jakarta.persistence.criteria.Predicate
 import jakarta.persistence.criteria.Root
@@ -25,7 +25,7 @@ enum class JobOfferStatus {
 class JobOffer(
     @ManyToOne
     var customer: Customer,
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     var professional: Professional?,
     var description: String? = null,
     @Enumerated(EnumType.STRING)
@@ -42,9 +42,8 @@ class JobOffer(
             duration * PROFIT_MARGIN * it.dailyRate
         }
 
-    fun update(updatedJobOffer: UpdateJobOfferDTO) {
+    fun update(updatedJobOffer: UpdateJobOfferDetailsDTO) {
         this.skills = updatedJobOffer.skills.toMutableSet()
-        this.status = updatedJobOffer.status
         this.description = updatedJobOffer.description
         this.duration = updatedJobOffer.duration
     }
@@ -60,13 +59,17 @@ class JobOffer(
                 }
 
                 if (filters.byCustomerId != null) {
-                    val predicate = criteriaBuilder.equal(jobOffer.get<Long>("customer_id"), filters.byCustomerId)
+                    val predicate =
+                        criteriaBuilder.equal(jobOffer.get<Long>("customer").get<Long>("id"), filters.byCustomerId)
 
                     predicates.add(predicate)
                 }
                 if (filters.byProfessionalId != null) {
                     val predicate =
-                        criteriaBuilder.equal(jobOffer.get<Long>("professional_id"), filters.byProfessionalId)
+                        criteriaBuilder.equal(
+                            jobOffer.get<Long>("professional").get<Long>("id"),
+                            filters.byProfessionalId
+                        )
 
                     predicates.add(predicate)
                 }

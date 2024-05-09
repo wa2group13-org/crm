@@ -22,6 +22,10 @@ class JobOfferExceptionHandler {
             )
 
             is JobOfferException.NoteNotFound -> ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, e.message)
+            is JobOfferException.TransitionStateError -> ProblemDetail.forStatusAndDetail(
+                HttpStatus.BAD_REQUEST,
+                e.message
+            )
         }
 
     }

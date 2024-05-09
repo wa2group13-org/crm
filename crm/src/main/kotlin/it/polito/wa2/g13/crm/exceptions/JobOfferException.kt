@@ -44,9 +44,20 @@ sealed class JobOfferException(override val message: String, override val cause:
         JobOfferException(message, cause) {
         companion object {
             @JvmStatic
+            fun from(id: Long): NoteNotFound =
+                NoteNotFound(
+                    message = "Note with $id not found"
+                )
+        }
+    }
+
+    data class TransitionStateError(override val message: String, override val cause: Throwable? = null) :
+        JobOfferException(message, cause) {
+        companion object {
+            @JvmStatic
             fun from(id: Long): MissingProfessional =
                 MissingProfessional(
-                    message = "Note with $id not found"
+                    message = "Cannot execute the state transition for JobOffer $id"
                 )
         }
     }
