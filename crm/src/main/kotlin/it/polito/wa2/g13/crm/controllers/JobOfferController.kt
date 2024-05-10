@@ -77,9 +77,9 @@ class JobOfferController(
     @PostMapping("/{jobOfferId}/notes")
     fun addNoteByJobOfferId(
         @PathVariable jobOfferId: Long,
-        @RequestBody addJobOfferHistoryDTO: AddJobOfferHistoryDTO
+        @RequestBody createJobOfferHistoryDTO: CreateJobOfferHistoryDTO
     ): JobOfferHistoryDTO {
-        return jobOfferService.addNoteByJobOfferId(jobOfferId, addJobOfferHistoryDTO)
+        return jobOfferService.addNoteByJobOfferId(jobOfferId, createJobOfferHistoryDTO)
     }
 
     @PutMapping("/{jobOfferId}/notes/{noteId}")
