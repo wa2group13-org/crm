@@ -1,14 +1,6 @@
 package it.polito.wa2.g13.crm.dtos
 
 import it.polito.wa2.g13.crm.data.customer.Customer
-import it.polito.wa2.g13.crm.data.joboffer.JobOffer
-
-class JobOfferDTO{
-    companion object{
-        @JvmStatic
-        fun from(job : JobOffer) = JobOfferDTO()
-    }
-}
 
 class CustomerDTO(
     val id: Long,
