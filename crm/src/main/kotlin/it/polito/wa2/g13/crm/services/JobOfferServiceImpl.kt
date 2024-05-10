@@ -20,7 +20,6 @@ import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.OffsetDateTime
-import kotlin.math.log
 
 @Service
 @Transactional
@@ -151,7 +150,7 @@ class JobOfferServiceImpl(
         }.sortedByDescending { it.logTime }
     }
 
-    override fun addNoteByJobOfferId(id: Long, note: AddJobOfferHistoryDTO): JobOfferHistoryDTO {
+    override fun addNoteByJobOfferId(id: Long, note: CreateJobOfferHistoryDTO): JobOfferHistoryDTO {
         val jobOffer = jobOfferRepository.findById(id).nullable() ?: throw JobOfferException.NotFound.from(id)
         var assignedProfessional: Professional? = null
         if (note.assignedProfessional != null) {

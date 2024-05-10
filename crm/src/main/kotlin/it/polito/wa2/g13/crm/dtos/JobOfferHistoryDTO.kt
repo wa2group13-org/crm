@@ -25,7 +25,7 @@ data class JobOfferHistoryDTO(
     }
 }
 
-data class AddJobOfferHistoryDTO(
+data class CreateJobOfferHistoryDTO(
     val assignedProfessional: Long?,
     val currentStatus: JobOfferStatus,
     val note: String?,

@@ -37,11 +37,14 @@ data class JobOfferDTO(
 }
 
 data class CreateJobOfferDTO(
-    @field:Min(0, message = "customerId cannot be negative") val customerId: Long,
-    @field:NotBlank(message = "description should not be blank") val description: String,
+    @field:Min(0, message = "customerId cannot be negative")
+    val customerId: Long,
+    @field:NotBlank(message = "description should not be blank")
+    val description: String,
     val status: JobOfferStatus,
     val skills: List<String>,
-    @field:Min(0, message = "duration cannot be negative") val duration: Long
+    @field:Min(0, message = "duration cannot be negative")
+    val duration: Long
 )
 
 data class UpdateJobOfferDetailsDTO(

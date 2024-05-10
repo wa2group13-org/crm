@@ -1,6 +1,7 @@
 package it.polito.wa2.g13.crm.utils
 
 import it.polito.wa2.g13.crm.data.contact.ContactCategory
+import it.polito.wa2.g13.crm.data.joboffer.JobOfferStatus
 import it.polito.wa2.g13.crm.data.message.Priority
 import it.polito.wa2.g13.crm.data.professional.EmploymentState
 import it.polito.wa2.g13.crm.dtos.*
@@ -74,6 +75,32 @@ fun randomProfessional(contactId: Long, randomRelations: Int?): CreateProfession
     contactId = contactId,
 )
 
+
+// From here, to figure out if are needed or not
+fun randomJobOfferHistory(assignedProfessional: Long?, currentStatus: JobOfferStatus): CreateJobOfferHistoryDTO =
+    CreateJobOfferHistoryDTO(
+        assignedProfessional = assignedProfessional,
+        currentStatus = currentStatus,
+        note = UUID.randomUUID().toString(),
+    )
+
+fun randomJobOffer(customerId: Long, randomRelations: Int?): CreateJobOfferDTO = CreateJobOfferDTO(
+    customerId = customerId,
+    description = UUID.randomUUID().toString(),
+    status = JobOfferStatus.entries.toTypedArray().random(),
+    skills = randomRelations?.let {
+        (0..it).map { CreateSkillDTO.from(UUID.randomUUID().toString()).toString() }.toList()
+    }
+        ?: listOf(),
+    duration = Random.nextLong(0, 100)
+)
+
 fun randomProfessionals(contactIds: List<Long>, randomRelations: Int?): List<CreateProfessionalDTO> = contactIds
     .map { randomProfessional(it, randomRelations) }
     .toList()
+
+//fun randomCustomers(randomRelations: Int?): List<CustomerDTO> =
+//    randomRelations?.let { (0..it).map { CustomerDTO(
+//        id = it,
+//        offers =
+//    ) } } :? listOf()
