@@ -12,6 +12,7 @@ class ProfessionalExceptionHandler {
     fun handleProfessionalException(e: ProfessionalException): ProblemDetail {
         return when (e) {
             is ProfessionalException.NotFound -> ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, e.message)
+            is ProfessionalException.InvalidContactState-> ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, e.message)
         }
     }
 }
