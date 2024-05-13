@@ -104,26 +104,14 @@ fun randomProfessionals(contactIds: List<Long>, randomRelations: Int?): List<Cre
     .map { randomProfessional(it, randomRelations) }
     .toList()
 
-fun randomCustomer(contact: ContactDTO, randomRelations: Int?): CreateCustomerDTO = CreateCustomerDTO(
-    offers = randomRelations?.let {
-        (0..it).map {
-            CreateJobOfferDTO(
-                customerId = contact.id,
-                description = UUID.randomUUID().toString(),
-                status = JobOfferStatus.entries.toTypedArray().random(),
-                skills = randomRelations.let { n ->
-                    (0..n).map { CreateSkillsDTO(UUID.randomUUID().toString()) }.toSet()
-                },
-                duration = Random.nextLong(0, 100)
-            )
-        }
-    } ?: listOf(),
-    contact = CreateContactDTO.from(contact),
+fun randomCustomer(contact: ContactDTO/*, randomRelations: Int?*/): CreateCustomerDTO = CreateCustomerDTO(
+    jobOffers = listOf(),
+    contact = contact,
     note = UUID.randomUUID().toString(),
 )
 
-fun randomCustomers(contacts: List<ContactDTO>, randomRelations: Int?): List<CreateCustomerDTO> = contacts
-    .map { randomCustomer(it, randomRelations) }
+fun randomCustomers(contacts: List<ContactDTO>/*, randomRelations: Int?*/): List<CreateCustomerDTO> = contacts
+    .map { randomCustomer(it/*, randomRelations*/) }
     .toList()
 
 fun randomJobOfferHistory(assignedProfessional: Long?, currentStatus: JobOfferStatus): CreateJobOfferHistoryDTO =

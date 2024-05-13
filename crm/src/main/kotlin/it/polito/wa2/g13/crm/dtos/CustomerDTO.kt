@@ -4,30 +4,30 @@ import it.polito.wa2.g13.crm.data.customer.Customer
 
 data class CustomerDTO(
     val id: Long,
-    val offers: List<CreateJobOfferDTO>,
+    val jobOffers: List<JobOfferDTO>,
     val note: String?,
-    val contact: CreateContactDTO,
+    val contact: ContactDTO,
 ) {
     companion object {
         @JvmStatic
         fun from(customer: Customer): CustomerDTO = CustomerDTO(
             id = customer.id,
             note = customer.note,
-            offers = customer.offers.map { CreateJobOfferDTO.from(JobOfferDTO.from(it)) }.toList(),
-            contact = CreateContactDTO.from(ContactDTO.from(customer.contact))
+            jobOffers = customer.jobOffers.map { JobOfferDTO.from(it) }.toList(),
+            contact = ContactDTO.from(customer.contact)
         )
     }
 }
 
 data class CreateCustomerDTO(
-    val offers: List<CreateJobOfferDTO>,
+    val jobOffers: List<JobOfferDTO>,
     val note: String?,
-    val contact: CreateContactDTO
+    val contact: ContactDTO
 ) {
     companion object {
         @JvmStatic
         fun from(customerDTO: CustomerDTO): CreateCustomerDTO = CreateCustomerDTO(
-            offers = customerDTO.offers,
+            jobOffers = customerDTO.jobOffers,
             note = customerDTO.note,
             contact = customerDTO.contact
         )

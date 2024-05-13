@@ -11,19 +11,19 @@ import jakarta.persistence.OneToOne
 class Customer(
 
     @OneToOne
-    var contact : Contact,
+    var contact: Contact,
 
     @OneToMany(mappedBy = "customer")
-    var offers : MutableSet<JobOffer>,
+    var jobOffers: MutableSet<JobOffer>,
 
-    var note : String?,
+    var note: String?,
 
 
-) : BaseEntity() {
-    companion object{
-        fun createNewCustomer(contact: Contact) : Customer = Customer(
+    ) : BaseEntity() {
+    companion object {
+        fun createNewCustomer(contact: Contact): Customer = Customer(
             contact = contact,
-            offers = mutableSetOf(),
+            jobOffers = mutableSetOf(),
             note = null
         )
     }

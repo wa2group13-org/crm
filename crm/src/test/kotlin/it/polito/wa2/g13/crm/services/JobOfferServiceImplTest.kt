@@ -37,7 +37,7 @@ class JobOfferServiceImplTest : IntegrationTest() {
     fun initJobOffers(n: Int): Pair<List<Long>, List<CreateJobOfferDTO>> {
         val contacts = randomCategorizedContacts(n, n, ContactCategory.Unknown)
         val contactsIds = contacts.map { contactService.createContact(it) }.toList()
-        randomCustomers(contactService.getContacts(0, 10, null, null, null), n)
+        randomCustomers(contactService.getContacts(0, 10, null, null, null))
         val customersIds = contactsIds.map { customerService.createCustomer(it).id }.toList()
         val jobOffers = randomJobOffers(customersIds, n, JobOfferStatus.Created)
         val jobOffersIds = jobOffers.map { jobOfferService.createJobOffer(it).id }.toList()
