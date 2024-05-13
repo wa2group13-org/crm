@@ -1,0 +1,29 @@
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: update
+
+logging:
+  level:
+    org:
+      hibernate:
+        SQL: debug
+        type:
+          descriptor:
+            sql:
+              BasicBinder: trace
+
+server:
+  error:
+    include-message: always
+    include-binding-errors: always
+
+### For Transaction logging
+#logging.level.org.springframework.test.context.transaction.TransactionContext=debug
+#logging.level.org.springframework.transaction.interceptor=trace
+
+### To save the schema.sql that generates the tables from the entities
+#spring.jpa.properties.jakarta.persistence.schema-generation.create-source=metadata
+#spring.jpa.properties.jakarta.persistence.schema-generation.scripts.action=create
+#spring.jpa.properties.jakarta.persistence.schema-generation.scripts.create-target=schema.sql
+
