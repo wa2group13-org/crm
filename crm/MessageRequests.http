@@ -122,7 +122,7 @@ Content-Type: application/json
 {
   "name": "ciao",
   "surname": "",
-  "category": "Customer",
+  "category": "Unknown",
   "telephones": [],
   "emails": [],
   "addresses": []
@@ -135,7 +135,7 @@ Content-Type: application/json
 {
   "name": "name1",
   "surname": "surname1",
-  "category": "Customer",
+  "category": "Unknown",
   "telephones": [],
   "emails": [],
   "addresses": []
@@ -162,7 +162,7 @@ Content-Type: application/json
 {
   "name": "name2",
   "surname": "surname2",
-  "category": "Customer",
+  "category": "Unknown",
   "telephones": [],
   "emails": [],
   "addresses": []
@@ -180,7 +180,7 @@ Content-Type: application/json
 {
   "name": "rename11",
   "surname": "surname11",
-  "category": "Customer",
+  "category": "Unknown",
   "telephones": [],
   "emails": [],
   "addresses": []
@@ -313,3 +313,20 @@ DELETE http://localhost:8080/API/contacts/4/addresses/2
 
 ### Delete address from a contact, address not found: 404
 DELETE http://localhost:8080/API/contacts/4/addresses/1
+
+### testiamo
+POST http://localhost:8080/API/customers/
+Content-Type: application/json
+
+{"contactId": 2}
+
+### testiamo note
+PUT http://localhost:8080/API/customers/1/note
+Content-Type: application/json
+
+{
+  "note": "pipipip"
+}
+
+### justtest
+GET http://localhost:8080/API/customers/1
