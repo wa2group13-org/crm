@@ -38,5 +38,17 @@ abstract class IntegrationTest {
                 )
             }
 
+//        @BeforeAll
+//        @JvmStatic
+//        fun startDBContainer() {
+//            postgres.start()
+//        }
+//
+//        @AfterAll
+//        @JvmStatic
+//        fun stopDBContainer() {
+//            postgres.stop()
+//        }
+
     }
 }

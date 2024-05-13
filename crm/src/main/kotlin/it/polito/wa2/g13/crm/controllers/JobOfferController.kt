@@ -4,7 +4,6 @@ import it.polito.wa2.g13.crm.dtos.*
 import it.polito.wa2.g13.crm.services.JobOfferService
 import jakarta.validation.Valid
 import jakarta.validation.constraints.Min
-import org.springframework.data.domain.Page
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
 
@@ -23,7 +22,7 @@ class JobOfferController(
     @GetMapping("", "/")
     fun getJobOffers(
         @Valid getJobOffers: GetJobOffers
-    ): Page<JobOfferDTO> {
+    ): List<JobOfferDTO> {
         return jobOfferService.getJobOffersByParams(
             getJobOffers.filters,
             getJobOffers.page,

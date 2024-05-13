@@ -12,9 +12,9 @@ data class JobOfferDTO(
     val id: Long,
     val customerId: Long,
     val professionalId: Long?,
-    val description: String?,
+    val description: String,
     val status: JobOfferStatus,
-    val skills: List<String>,
+    val skills: Set<String>,
     val duration: Long,
     val notes: List<JobOfferHistoryDTO>,
     val value: Double?
@@ -26,9 +26,9 @@ data class JobOfferDTO(
                 jobOffer.id,
                 jobOffer.customer.id,
                 jobOffer.professional?.id,
-                jobOffer.description,
+                jobOffer.description?:"",
                 jobOffer.status,
-                jobOffer.skills.toList(),
+                jobOffer.skills,
                 jobOffer.duration,
                 jobOffer.notes.map { JobOfferHistoryDTO.from(it) },
                 jobOffer.value
@@ -52,7 +52,20 @@ data class CreateJobOfferDTO(
     @field:Size(min = 0, max = 100) val skills: Set<CreateSkillsDTO>,
     @field:Min(0, message = "duration cannot be negative")
     val duration: Long
-)
+) {
+    companion object {
+        @JvmStatic
+        fun from(jobOfferDTO: JobOfferDTO): CreateJobOfferDTO {
+            return CreateJobOfferDTO(
+                customerId = jobOfferDTO.customerId,
+                description = jobOfferDTO.description,
+                status = jobOfferDTO.status,
+                skills = jobOfferDTO.skills.map { CreateSkillsDTO(it) }.toSet(),
+                duration = jobOfferDTO.duration
+            )
+        }
+    }
+}
 
 data class UpdateJobOfferDetailsDTO(
     @field:NotBlank(message = "description should not be blank")

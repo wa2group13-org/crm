@@ -48,6 +48,31 @@ fun randomContacts(n: Int, randomRelations: Int?) = generateSequence {
     ) else randomContact()
 }.take(n).toList()
 
+fun randomCategorizedContact(
+    telephones: List<CreateTelephoneDTO> = listOf(),
+    emails: List<CreateEmailDTO> = listOf(),
+    addresses: List<CreateAddressDTO> = listOf(),
+    category: ContactCategory? = ContactCategory.entries.toTypedArray().random(),
+): CreateContactDTO = CreateContactDTO(
+    name = UUID.randomUUID().toString(),
+    surname = UUID.randomUUID().toString(),
+    category = category ?: ContactCategory.entries.toTypedArray().random(),
+    ssn = UUID.randomUUID().toString(),
+    telephones = telephones,
+    emails = emails,
+    addresses = addresses,
+)
+
+fun randomCategorizedContacts(
+    n: Int,
+    randomRelations: Int?,
+    category: ContactCategory? = ContactCategory.entries.toTypedArray().random()
+) = generateSequence {
+    if (randomRelations != null) randomCategorizedContact(
+        randomTelephones(randomRelations), randomEmails(randomRelations), randomAddresses(randomRelations), category
+    ) else randomCategorizedContact()
+}.take(n).toList()
+
 fun randomMessage(priority: Priority?, channel: String?): CreateMessageDTO {
     val prior = priority ?: listOf(
         Priority.Low, Priority.Medium, Priority.High
@@ -75,8 +100,32 @@ fun randomProfessional(contactId: Long, randomRelations: Int?): CreateProfession
     contactId = contactId,
 )
 
+fun randomProfessionals(contactIds: List<Long>, randomRelations: Int?): List<CreateProfessionalDTO> = contactIds
+    .map { randomProfessional(it, randomRelations) }
+    .toList()
 
-// From here, to figure out if are needed or not
+fun randomCustomer(contact: ContactDTO, randomRelations: Int?): CreateCustomerDTO = CreateCustomerDTO(
+    offers = randomRelations?.let {
+        (0..it).map {
+            CreateJobOfferDTO(
+                customerId = contact.id,
+                description = UUID.randomUUID().toString(),
+                status = JobOfferStatus.entries.toTypedArray().random(),
+                skills = randomRelations.let { n ->
+                    (0..n).map { CreateSkillsDTO(UUID.randomUUID().toString()) }.toSet()
+                },
+                duration = Random.nextLong(0, 100)
+            )
+        }
+    } ?: listOf(),
+    contact = CreateContactDTO.from(contact),
+    note = UUID.randomUUID().toString(),
+)
+
+fun randomCustomers(contacts: List<ContactDTO>, randomRelations: Int?): List<CreateCustomerDTO> = contacts
+    .map { randomCustomer(it, randomRelations) }
+    .toList()
+
 fun randomJobOfferHistory(assignedProfessional: Long?, currentStatus: JobOfferStatus): CreateJobOfferHistoryDTO =
     CreateJobOfferHistoryDTO(
         assignedProfessional = assignedProfessional,
@@ -84,23 +133,31 @@ fun randomJobOfferHistory(assignedProfessional: Long?, currentStatus: JobOfferSt
         note = UUID.randomUUID().toString(),
     )
 
-fun randomJobOffer(customerId: Long, randomRelations: Int?): CreateJobOfferDTO = CreateJobOfferDTO(
-    customerId = customerId,
-    description = UUID.randomUUID().toString(),
-    status = JobOfferStatus.entries.toTypedArray().random(),
-    skills = randomRelations?.let {
-        (0..it).map { CreateSkillDTO.from(UUID.randomUUID().toString()).toString() }.toList()
-    }
-        ?: listOf(),
-    duration = Random.nextLong(0, 100)
-)
+fun randomSkills(n: Int): List<String> {
+    return n.let {
+        (0..it).map {
+            UUID.randomUUID().toString()
+        }
+    }.toList()
+}
 
-fun randomProfessionals(contactIds: List<Long>, randomRelations: Int?): List<CreateProfessionalDTO> = contactIds
-    .map { randomProfessional(it, randomRelations) }
-    .toList()
+fun randomJobOffer(
+    customerId: Long,
+    randomRelations: Int?,
+    status: JobOfferStatus?
+): CreateJobOfferDTO =
+    CreateJobOfferDTO(
+        customerId = customerId,
+        description = UUID.randomUUID().toString(),
+        status = status ?: JobOfferStatus.entries.toTypedArray().random(),
+        skills = randomRelations?.let {
+            (0..it).map { CreateSkillsDTO(UUID.randomUUID().toString()) }.toSet()
+        }
+            ?: setOf(),
+        duration = Random.nextLong(0, 100)
+    )
 
-//fun randomCustomers(randomRelations: Int?): List<CustomerDTO> =
-//    randomRelations?.let { (0..it).map { CustomerDTO(
-//        id = it,
-//        offers =
-//    ) } } :? listOf()
+fun randomJobOffers(ids: List<Long>, randomRelations: Int?, status: JobOfferStatus?): List<CreateJobOfferDTO> =
+    ids
+        .map { randomJobOffer(it, randomRelations, status) }
+        .toList()

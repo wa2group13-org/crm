@@ -15,7 +15,6 @@ import it.polito.wa2.g13.crm.repositories.JobOfferRepository
 import it.polito.wa2.g13.crm.repositories.ProfessionalRepository
 import it.polito.wa2.g13.crm.utils.nullable
 import org.slf4j.LoggerFactory
-import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -45,11 +44,12 @@ class JobOfferServiceImpl(
         return offer.value
     }
 
-    override fun getJobOffersByParams(filters: JobOfferFilters?, page: Int, limit: Int): Page<JobOfferDTO> {
+    override fun getJobOffersByParams(filters: JobOfferFilters?, page: Int, limit: Int): List<JobOfferDTO> {
         return jobOfferRepository.findAll(
             JobOffer.Spec.withFilters(filters),
             PageRequest.of(page, limit)
         ).map { JobOfferDTO.from(it) }
+            .toList()
     }
 
     override fun createJobOffer(createJobOfferDTO: CreateJobOfferDTO): JobOfferDTO {
@@ -113,11 +113,13 @@ class JobOfferServiceImpl(
             }
             professionalRepository.save(professional)
         }
+        jobOffer.status = updateJobOfferStatusDTO.status
+
         val note = JobOfferHistory(
             jobOffer,
             assignedProfessional = professional,
             logTime = OffsetDateTime.now(),
-            currentStatus = updateJobOfferStatusDTO.status,
+            currentStatus = jobOffer.status,
             note = updateJobOfferStatusDTO.note
         )
         jobOffer.notes.add(note)
