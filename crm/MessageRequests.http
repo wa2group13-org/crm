@@ -313,3 +313,18 @@ DELETE http://localhost:8080/API/contacts/4/addresses/2
 
 ### Delete address from a contact, address not found: 404
 DELETE http://localhost:8080/API/contacts/4/addresses/1
+
+###
+POST http://localhost:8080/API/professionals
+Content-Type: application/json
+
+{
+  "contactId": 1,
+  "dailyRate": 23,
+  "employmentState": "Available",
+  "notes": "",
+  "skills": []
+}
+
+###
+GET http://localhost:8080/API/professionals?page=0&limit=10

@@ -9,11 +9,11 @@ import it.polito.wa2.g13.crm.exceptions.ProfessionalException
 import it.polito.wa2.g13.crm.services.ProfessionalService
 import jakarta.validation.Valid
 import jakarta.validation.constraints.*
+import org.springframework.data.domain.Page
 import org.springframework.http.ResponseEntity
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
 import java.net.URI
-import kotlin.Throws
 
 @RestController
 @RequestMapping("/API/professionals")
@@ -26,7 +26,7 @@ class ProfessionalController(
         @RequestParam("page") @Min(0) page: Int,
         @RequestParam("limit") @Min(0) @Max(10) limit: Int,
         professionalFilters: ProfessionalFilters,
-    ): List<ProfessionalDTO> {
+    ): Page<ProfessionalDTO> {
         return professionalService.getProfessionals(page, limit, professionalFilters)
     }
 

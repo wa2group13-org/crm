@@ -1,15 +1,16 @@
 package it.polito.wa2.g13.crm.services
 
 import it.polito.wa2.g13.crm.dtos.CustomerDTO
+import org.springframework.data.domain.Page
 import org.springframework.stereotype.Service
 
 @Service
 interface CustomerService {
-    fun getCustomers(page: Int, limit: Int) : List<CustomerDTO>
+    fun getCustomers(page: Int, limit: Int): Page<CustomerDTO>
 
-    fun getCustomerById(id: Long) : CustomerDTO
+    fun getCustomerById(id: Long): CustomerDTO
 
-    fun createCustomer(contactId: Long) : CustomerDTO
+    fun createCustomer(contactId: Long): CustomerDTO
 
     fun deleteCustomerById(customerId: Long)
 

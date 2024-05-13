@@ -51,7 +51,7 @@ class ContactServiceImplTest : IntegrationTest() {
             val result = contactService.getContacts(0, limit, null, null, null)
 
             i += 1
-            assertEquals(min(i, limit), result.size)
+            assertEquals(min(i, limit), result.content.size)
         }
     }
 
@@ -71,9 +71,9 @@ class ContactServiceImplTest : IntegrationTest() {
 
         val result = contactService.getContacts(0, 10, null, telephone1[0].number, null)
 
-        assertEquals(result.size, 2)
-        assertEquals(result.getOrNull(0)?.telephones?.map { it.number }, telephone1.map { it.number })
-        assertEquals(result.getOrNull(1)?.telephones?.map { it.number }, telephone1.map { it.number })
+        assertEquals(result.content.size, 2)
+        assertEquals(result.content.getOrNull(0)?.telephones?.map { it.number }, telephone1.map { it.number })
+        assertEquals(result.content.getOrNull(1)?.telephones?.map { it.number }, telephone1.map { it.number })
     }
 
     @Test
@@ -93,10 +93,10 @@ class ContactServiceImplTest : IntegrationTest() {
 
         val result = contactService.getContacts(0, 10, email1[0].email, null, null)
 
-        assertEquals(result.size, 3)
-        assertEquals(result.getOrNull(0)?.emails?.map { it.email }, email1.map { it.email })
-        assertEquals(result.getOrNull(1)?.emails?.map { it.email }, email1.map { it.email })
-        assertEquals(result.getOrNull(2)?.emails?.map { it.email }, email1.map { it.email })
+        assertEquals(result.content.size, 3)
+        assertEquals(result.content.getOrNull(0)?.emails?.map { it.email }, email1.map { it.email })
+        assertEquals(result.content.getOrNull(1)?.emails?.map { it.email }, email1.map { it.email })
+        assertEquals(result.content.getOrNull(2)?.emails?.map { it.email }, email1.map { it.email })
     }
 
     @Test
@@ -116,9 +116,9 @@ class ContactServiceImplTest : IntegrationTest() {
 
         val result = contactService.getContacts(0, 10, null, null, name1)
 
-        assertEquals(result.size, 3)
-        assertEquals(result.getOrNull(0)?.name, "name1")
-        assertEquals(result.getOrNull(1)?.name, "name1")
+        assertEquals(result.content.size, 3)
+        assertEquals(result.content.getOrNull(0)?.name, "name1")
+        assertEquals(result.content.getOrNull(1)?.name, "name1")
     }
 
     @Test
@@ -135,10 +135,8 @@ class ContactServiceImplTest : IntegrationTest() {
 
         val result = contactService.getContacts(0, 10, email[0].email, telephone[0].number, name)
 
-        logger.info("Result size: ${result.size}")
-
-        assertEquals(1, result.size)
-        assertEquals(contacts[0], CreateContactDTO.from(result[0]))
+        assertEquals(1, result.content.size)
+        assertEquals(contacts[0], CreateContactDTO.from(result.content[0]))
     }
 
     @Test

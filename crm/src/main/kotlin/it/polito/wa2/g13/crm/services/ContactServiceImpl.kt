@@ -13,11 +13,11 @@ import it.polito.wa2.g13.crm.repositories.EmailRepository
 import it.polito.wa2.g13.crm.repositories.TelephoneRepository
 import it.polito.wa2.g13.crm.utils.nullable
 import org.slf4j.LoggerFactory
+import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import kotlin.jvm.Throws
 
 @Service
 @Transactional
@@ -247,7 +247,7 @@ class ContactServiceImpl(
         byEmail: String?,
         byTelephone: String?,
         byName: String?,
-    ): List<ContactDTO> {
+    ): Page<ContactDTO> {
         return contactRepository
             .findAll(
                 Contact.Spec.withFilters(
@@ -256,7 +256,6 @@ class ContactServiceImpl(
                 PageRequest.of(page, limit),
             )
             .map { ContactDTO.from(it) }
-            .toList()
     }
 
     override fun getContactById(id: Long): ContactDTO {

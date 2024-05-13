@@ -1,9 +1,13 @@
 package it.polito.wa2.g13.crm.controllers
 
 import it.polito.wa2.g13.crm.IntegrationTest
-import it.polito.wa2.g13.crm.dtos.*
+import it.polito.wa2.g13.crm.dtos.ContactDTO
+import it.polito.wa2.g13.crm.dtos.CreateContactDTO
+import it.polito.wa2.g13.crm.dtos.CreateEmailDTO
+import it.polito.wa2.g13.crm.dtos.EmailDTO
 import it.polito.wa2.g13.crm.services.ContactService
 import it.polito.wa2.g13.crm.services.ContactServiceImplTest
+import it.polito.wa2.g13.crm.utils.ResultPage
 import it.polito.wa2.g13.crm.utils.randomContacts
 import it.polito.wa2.g13.crm.utils.randomEmails
 import org.assertj.core.api.Assertions
@@ -47,7 +51,7 @@ class ContactControllerTest : IntegrationTest() {
             .get("/API/contacts?limit=$limit&page=$page")
             .build()
 
-        val res = restClient.exchange<List<ContactDTO>>(req)
+        val res = restClient.exchange<ResultPage<ContactDTO>>(req)
 
         assertEquals(true, res.statusCode.is2xxSuccessful)
         Assertions.assertThat(res.body?.map { CreateContactDTO.from(it) })
@@ -104,7 +108,7 @@ class ContactControllerTest : IntegrationTest() {
 
     @Test
     fun `delete created contact`() {
-        val contactToDelete = restClient.exchange<List<ContactDTO>>(
+        val contactToDelete = restClient.exchange<ResultPage<ContactDTO>>(
             RequestEntity
                 .get("/API/contacts?page=0&limit=1")
                 .build()
@@ -120,7 +124,7 @@ class ContactControllerTest : IntegrationTest() {
     }
 
     private fun prepareEmails(): Pair<ContactDTO, List<EmailDTO>> {
-        val contact = restClient.exchange<List<ContactDTO>>(
+        val contact = restClient.exchange<ResultPage<ContactDTO>>(
             RequestEntity
                 .get("/API/contacts?page=0&limit=1")
                 .build()

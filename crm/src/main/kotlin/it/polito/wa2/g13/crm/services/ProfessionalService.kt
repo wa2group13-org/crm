@@ -6,10 +6,10 @@ import it.polito.wa2.g13.crm.dtos.CreateSkillDTO
 import it.polito.wa2.g13.crm.dtos.ProfessionalDTO
 import it.polito.wa2.g13.crm.dtos.ProfessionalFilters
 import it.polito.wa2.g13.crm.exceptions.ProfessionalException
-import kotlin.Throws
+import org.springframework.data.domain.Page
 
 interface ProfessionalService {
-    fun getProfessionals(page: Int, limit: Int, professionalFilters: ProfessionalFilters): List<ProfessionalDTO>
+    fun getProfessionals(page: Int, limit: Int, professionalFilters: ProfessionalFilters): Page<ProfessionalDTO>
 
     fun createProfessional(professionalDto: CreateProfessionalDTO): Long
 

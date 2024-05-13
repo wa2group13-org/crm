@@ -9,6 +9,7 @@ import it.polito.wa2.g13.crm.repositories.ContactRepository
 import it.polito.wa2.g13.crm.repositories.CustomerRepository
 import it.polito.wa2.g13.crm.utils.nullable
 import jakarta.transaction.Transactional
+import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
 
@@ -18,8 +19,8 @@ class CustomerServiceImpl(
     private val customerRepository: CustomerRepository,
     private val contactRepository: ContactRepository,
 ) : CustomerService {
-    override fun getCustomers(page: Int, limit: Int): List<CustomerDTO> {
-        return customerRepository.findAll(PageRequest.of(page, limit)).map { CustomerDTO.from(it) }.toList()
+    override fun getCustomers(page: Int, limit: Int): Page<CustomerDTO> {
+        return customerRepository.findAll(PageRequest.of(page, limit)).map { CustomerDTO.from(it) }
     }
 
     override fun getCustomerById(id: Long): CustomerDTO {

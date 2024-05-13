@@ -2,6 +2,7 @@ package it.polito.wa2.g13.crm.services
 
 import it.polito.wa2.g13.crm.dtos.*
 import it.polito.wa2.g13.crm.exceptions.ContactException
+import org.springframework.data.domain.Page
 
 interface ContactService {
 
@@ -14,7 +15,7 @@ interface ContactService {
         byEmail: String?,
         byTelephone: String?,
         byName: String?,
-    ): List<ContactDTO>
+    ): Page<ContactDTO>
 
     /**
      * Get a contact by [id].

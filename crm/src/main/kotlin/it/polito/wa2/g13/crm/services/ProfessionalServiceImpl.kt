@@ -12,6 +12,7 @@ import it.polito.wa2.g13.crm.repositories.ContactRepository
 import it.polito.wa2.g13.crm.repositories.ProfessionalRepository
 import it.polito.wa2.g13.crm.utils.nullable
 import org.slf4j.LoggerFactory
+import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -39,14 +40,13 @@ class ProfessionalServiceImpl(
         page: Int,
         limit: Int,
         professionalFilters: ProfessionalFilters
-    ): List<ProfessionalDTO> {
+    ): Page<ProfessionalDTO> {
         return professionalRepository
             .findAll(
                 Professional.Spec.withFilters(professionalFilters),
                 PageRequest.of(page, limit)
             )
             .map { ProfessionalDTO.from(it) }
-            .toList()
     }
 
     override fun createProfessional(professionalDto: CreateProfessionalDTO): Long {

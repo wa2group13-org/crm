@@ -6,12 +6,12 @@ import it.polito.wa2.g13.crm.services.ContactService
 import it.polito.wa2.g13.crm.utils.requestURIDropLast
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.validation.Valid
+import org.springframework.data.domain.Page
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
 import java.net.URI
-import kotlin.jvm.Throws
 
 @RestController
 @RequestMapping("/API/contacts")
@@ -27,7 +27,7 @@ class ContactController(
         @RequestParam("byEmail") byEmail: String?,
         @RequestParam("byTelephone") byTelephone: String?,
         @RequestParam("byName") byName: String?,
-    ): List<ContactDTO> {
+    ): Page<ContactDTO> {
         return contactService.getContacts(page, limit, byEmail, byTelephone, byName)
     }
 

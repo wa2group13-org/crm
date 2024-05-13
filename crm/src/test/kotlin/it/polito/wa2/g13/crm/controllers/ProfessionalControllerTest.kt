@@ -6,7 +6,10 @@ import it.polito.wa2.g13.crm.dtos.CreateProfessionalDTO
 import it.polito.wa2.g13.crm.dtos.ProfessionalDTO
 import it.polito.wa2.g13.crm.services.ContactService
 import it.polito.wa2.g13.crm.services.ProfessionalService
-import it.polito.wa2.g13.crm.utils.*
+import it.polito.wa2.g13.crm.utils.ResultPage
+import it.polito.wa2.g13.crm.utils.assertRecursive
+import it.polito.wa2.g13.crm.utils.randomContacts
+import it.polito.wa2.g13.crm.utils.randomProfessional
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -72,7 +75,9 @@ class ProfessionalControllerTest : IntegrationTest() {
             .get("/API/professionals?limit=$limit&page=$page")
             .build()
 
-        val res = restClient.exchange<List<ProfessionalDTO>>(req)
+        val res = restClient.exchange<ResultPage<ProfessionalDTO>>(req)
+
+
 
         assertEquals(true, res.statusCode.is2xxSuccessful)
         assertRecursive(professionals, res.body?.map { CreateProfessionalDTO.from(it) })
@@ -81,7 +86,7 @@ class ProfessionalControllerTest : IntegrationTest() {
     @Test
     fun `get by id should return the inserted professional`() {
         val professional = restClient
-            .exchange<List<ProfessionalDTO>>(
+            .exchange<ResultPage<ProfessionalDTO>>(
                 RequestEntity.get("/API/professionals?limit=10&page=0").build()
             )
             .body!!

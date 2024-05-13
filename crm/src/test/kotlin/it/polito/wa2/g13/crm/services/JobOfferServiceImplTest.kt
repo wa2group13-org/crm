@@ -7,7 +7,6 @@ import it.polito.wa2.g13.crm.dtos.CreateJobOfferDTO
 import it.polito.wa2.g13.crm.dtos.JobOfferFilters
 import it.polito.wa2.g13.crm.dtos.UpdateJobOfferStatusDTO
 import it.polito.wa2.g13.crm.utils.randomCategorizedContacts
-import it.polito.wa2.g13.crm.utils.randomCustomers
 import it.polito.wa2.g13.crm.utils.randomJobOffers
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -37,7 +36,7 @@ class JobOfferServiceImplTest : IntegrationTest() {
     fun initJobOffers(n: Int): Pair<List<Long>, List<CreateJobOfferDTO>> {
         val contacts = randomCategorizedContacts(n, n, ContactCategory.Unknown)
         val contactsIds = contacts.map { contactService.createContact(it) }.toList()
-        randomCustomers(contactService.getContacts(0, 10, null, null, null))
+//        randomCustomers(contactService.getContacts(0, 10, null, null, null))
         val customersIds = contactsIds.map { customerService.createCustomer(it).id }.toList()
         val jobOffers = randomJobOffers(customersIds, n, JobOfferStatus.Created)
         val jobOffersIds = jobOffers.map { jobOfferService.createJobOffer(it).id }.toList()
@@ -51,7 +50,7 @@ class JobOfferServiceImplTest : IntegrationTest() {
 
         val res = jobOfferService.getJobOffersByParams(null, 0, 10)
 
-        assertEquals(7, res.size)
+        assertEquals(7, res.content.size)
     }
 
     @Test
@@ -69,9 +68,9 @@ class JobOfferServiceImplTest : IntegrationTest() {
         filters.add(JobOfferStatus.SelectionPhase)
         val result = jobOfferService.getJobOffersByParams(JobOfferFilters(byStatus = filters), 0, 10)
 
-        assertEquals(3, result.size)
+        assertEquals(3, result.content.size)
         updated.forEachIndexed { id, jobOfferDTO ->
-            assertThat(result[id]).usingRecursiveComparison().ignoringFields("id").isEqualTo(jobOfferDTO)
+            assertThat(result.content[id]).usingRecursiveComparison().ignoringFields("id").isEqualTo(jobOfferDTO)
         }
     }
 
