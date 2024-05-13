@@ -37,15 +37,16 @@ class CustomerServiceImpl(
             contactId
         )
         val customer = Customer.createNewCustomer(contact)
+        contact.category = ContactCategory.Customer
         customerRepository.save(customer)
         return CustomerDTO.from(customer)
     }
 
     override fun deleteCustomerById(customerId: Long) {
-        if (!customerRepository.existsById(customerId))
-            throw CustomerException.NotFound.from(customerId)
-
-        contactRepository.deleteById(customerId)
+        val customer =
+            customerRepository.findById(customerId).nullable() ?: throw CustomerException.NotFound.from(customerId)
+        customer.contact.category = ContactCategory.Unknown
+        customerRepository.delete(customer)
     }
 
     override fun updateCustomerContact(customerId: Long, contactId: Long) {

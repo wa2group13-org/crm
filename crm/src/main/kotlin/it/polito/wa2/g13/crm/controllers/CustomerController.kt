@@ -1,6 +1,8 @@
 package it.polito.wa2.g13.crm.controllers
 
+import it.polito.wa2.g13.crm.dtos.ContactIdDTO
 import it.polito.wa2.g13.crm.dtos.CustomerDTO
+import it.polito.wa2.g13.crm.dtos.CustomerNoteDTO
 import it.polito.wa2.g13.crm.services.CustomerService
 import org.springframework.data.domain.Page
 import org.springframework.http.HttpStatus
@@ -27,8 +29,8 @@ class CustomerController(private val customerService: CustomerService) {
 
     @PostMapping("", "/")
     @ResponseStatus(HttpStatus.CREATED)
-    fun createCustomer(@RequestBody contactId: Long): CustomerDTO {
-        return customerService.createCustomer(contactId)
+    fun createCustomer(@RequestBody contactIdDTO: ContactIdDTO): CustomerDTO {
+        return customerService.createCustomer(contactIdDTO.contactId)
     }
 
     @DeleteMapping("/{customerId}")
@@ -38,13 +40,13 @@ class CustomerController(private val customerService: CustomerService) {
     }
 
     @PutMapping("/{customerId}/note")
-    fun updateCustomerNote(@PathVariable customerId: Long, @RequestBody note: String?) {
-        customerService.updateCustomerNote(customerId, note)
+    fun updateCustomerNote(@PathVariable customerId: Long, @RequestBody customerNoteDTO: CustomerNoteDTO) {
+        customerService.updateCustomerNote(customerId, customerNoteDTO.note)
     }
 
     @PutMapping("/{customerId}/contact")
-    fun updateCustomerContact(@PathVariable customerId: Long, @RequestBody contactId: Long) {
-        customerService.updateCustomerContact(customerId, contactId)
+    fun updateCustomerContact(@PathVariable customerId: Long, @RequestBody contactIdDTO: ContactIdDTO) {
+        customerService.updateCustomerContact(customerId, contactIdDTO.contactId)
     }
 
 
