@@ -61,7 +61,7 @@ class JobOfferServiceImpl(
             status = createJobOfferDTO.status,
             professional = null,
             description = createJobOfferDTO.description,
-            skills = createJobOfferDTO.skills.toMutableSet(),
+            skills = createJobOfferDTO.skills.map { it.skill }.toMutableSet(),
             notes = mutableSetOf()
         )
         jobOfferRepository.save(jobOffer)

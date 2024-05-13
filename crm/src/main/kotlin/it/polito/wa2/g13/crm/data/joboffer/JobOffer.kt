@@ -43,7 +43,7 @@ class JobOffer(
         }
 
     fun update(updatedJobOffer: UpdateJobOfferDetailsDTO) {
-        this.skills = updatedJobOffer.skills.toMutableSet()
+        this.skills = updatedJobOffer.skills.map { it.skill }.toMutableSet()
         this.description = updatedJobOffer.description
         this.duration = updatedJobOffer.duration
     }

@@ -9,7 +9,7 @@ import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
 
 @RestController
-@RequestMapping("/joboffers")
+@RequestMapping("/API/joboffers")
 @Validated
 class JobOfferController(
     private val jobOfferService: JobOfferService,
@@ -24,7 +24,6 @@ class JobOfferController(
     fun getJobOffers(
         @Valid getJobOffers: GetJobOffers
     ): Page<JobOfferDTO> {
-        println(getJobOffers)
         return jobOfferService.getJobOffersByParams(
             getJobOffers.filters,
             getJobOffers.page,

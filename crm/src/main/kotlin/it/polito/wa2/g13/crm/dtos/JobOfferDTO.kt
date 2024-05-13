@@ -6,6 +6,7 @@ import jakarta.validation.Valid
 import jakarta.validation.constraints.Max
 import jakarta.validation.constraints.Min
 import jakarta.validation.constraints.NotBlank
+import jakarta.validation.constraints.Size
 
 data class JobOfferDTO(
     val id: Long,
@@ -36,13 +37,19 @@ data class JobOfferDTO(
     }
 }
 
+data class CreateSkillsDTO(
+    @field:Size(min = 0, max = 255)
+    @field:NotBlank
+    val skill: String
+)
+
 data class CreateJobOfferDTO(
     @field:Min(0, message = "customerId cannot be negative")
     val customerId: Long,
     @field:NotBlank(message = "description should not be blank")
-    val description: String,
+   @field:Size(min = 0, max = 255) val description: String,
     val status: JobOfferStatus,
-    val skills: List<String>,
+    @field:Size(min = 0, max = 100) val skills: Set<CreateSkillsDTO>,
     @field:Min(0, message = "duration cannot be negative")
     val duration: Long
 )
@@ -50,7 +57,7 @@ data class CreateJobOfferDTO(
 data class UpdateJobOfferDetailsDTO(
     @field:NotBlank(message = "description should not be blank")
     val description: String,
-    val skills: List<String>,
+    @field:Size(min = 0, max = 100) val skills: Set<CreateSkillsDTO>,
     @field:Min(0, message = "duration cannot be negative") val duration: Long,
 )
 
@@ -58,6 +65,8 @@ data class UpdateJobOfferStatusDTO(
     val status: JobOfferStatus,
     @field:Min(0, message = "professional id cannot be negative")
     val professionalId: Long?,
+    @field:Size(min = 0, max = 1000)
+    @field:NotBlank(message = "note cannot be null")
     val note: String?
 )
 
