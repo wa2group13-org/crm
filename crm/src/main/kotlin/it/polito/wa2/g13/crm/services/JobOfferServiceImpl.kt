@@ -39,10 +39,8 @@ class JobOfferServiceImpl(
 
     override fun getJobOfferValue(id: Long): Double {
         val offer = jobOfferRepository.findById(id).nullable() ?: throw JobOfferException.NotFound.from(id)
-        if (offer.value == null) {
-            throw JobOfferException.MissingProfessional.from(id)
-        }
-        return offer.value
+
+        return offer.value ?: throw JobOfferException.MissingProfessional.from(id)
     }
 
     override fun getJobOffersByParams(filters: JobOfferFilters?, page: Int, limit: Int): Page<JobOfferDTO> {

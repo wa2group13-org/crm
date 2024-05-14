@@ -26,7 +26,7 @@ data class JobOfferDTO(
                 jobOffer.id,
                 jobOffer.customer.id,
                 jobOffer.professional?.id,
-                jobOffer.description?:"",
+                jobOffer.description ?: "",
                 jobOffer.status,
                 jobOffer.skills,
                 jobOffer.duration,
@@ -37,19 +37,13 @@ data class JobOfferDTO(
     }
 }
 
-data class CreateSkillsDTO(
-    @field:Size(min = 0, max = 255)
-    @field:NotBlank
-    val skill: String
-)
-
 data class CreateJobOfferDTO(
     @field:Min(0, message = "customerId cannot be negative")
     val customerId: Long,
     @field:NotBlank(message = "description should not be blank")
-   @field:Size(min = 0, max = 255) val description: String,
+    @field:Size(min = 0, max = 255) val description: String,
     val status: JobOfferStatus,
-    @field:Size(min = 0, max = 100) val skills: Set<CreateSkillsDTO>,
+    @field:Size(min = 0, max = 100) val skills: Set<CreateSkillDTO>,
     @field:Min(0, message = "duration cannot be negative")
     val duration: Long
 ) {
@@ -60,7 +54,7 @@ data class CreateJobOfferDTO(
                 customerId = jobOfferDTO.customerId,
                 description = jobOfferDTO.description,
                 status = jobOfferDTO.status,
-                skills = jobOfferDTO.skills.map { CreateSkillsDTO(it) }.toSet(),
+                skills = jobOfferDTO.skills.map { CreateSkillDTO(it) }.toSet(),
                 duration = jobOfferDTO.duration
             )
         }
@@ -70,7 +64,7 @@ data class CreateJobOfferDTO(
 data class UpdateJobOfferDetailsDTO(
     @field:NotBlank(message = "description should not be blank")
     val description: String,
-    @field:Size(min = 0, max = 100) val skills: Set<CreateSkillsDTO>,
+    @field:Size(min = 0, max = 100) val skills: Set<CreateSkillDTO>,
     @field:Min(0, message = "duration cannot be negative") val duration: Long,
 )
 
