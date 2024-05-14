@@ -117,8 +117,8 @@ class ProfessionalServiceImplTest : IntegrationTest() {
             )
         )
 
-        assertEquals(1, gotProfessional.size)
-        assertRecursive(professionalToFilter, CreateProfessionalDTO.from(gotProfessional[0]))
+        assertEquals(1, gotProfessional.content.size)
+        assertRecursive(professionalToFilter, CreateProfessionalDTO.from(gotProfessional.content[0]))
     }
 
     @Test
@@ -139,6 +139,6 @@ class ProfessionalServiceImplTest : IntegrationTest() {
             )
         )
 
-        assertEquals(0, gotProfessional.size)
+        assertEquals(0, gotProfessional.content.size)
     }
 }
