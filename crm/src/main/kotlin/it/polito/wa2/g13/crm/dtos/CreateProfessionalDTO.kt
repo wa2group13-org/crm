@@ -14,7 +14,7 @@ data class CreateProfessionalDTO(
     @field:Valid
     val skills: Set<CreateSkillDTO>,
     @field:NotBlank
-    @field:Size(max = 255)
+    @field:Size(max = 5000)
     val notes: String?,
     val contactId: Long,
 ) {

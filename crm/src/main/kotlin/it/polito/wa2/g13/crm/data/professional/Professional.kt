@@ -4,6 +4,7 @@ import it.polito.wa2.g13.crm.data.BaseEntity
 import it.polito.wa2.g13.crm.data.contact.Address
 import it.polito.wa2.g13.crm.data.contact.Contact
 import it.polito.wa2.g13.crm.data.joboffer.JobOffer
+import it.polito.wa2.g13.crm.data.contact.ContactCategory
 import it.polito.wa2.g13.crm.dtos.CreateProfessionalDTO
 import it.polito.wa2.g13.crm.dtos.ProfessionalFilters
 import jakarta.persistence.*
@@ -31,10 +32,13 @@ class Professional(
     @ElementCollection(fetch = FetchType.EAGER)
     var skills: MutableSet<String>,
 
+    @Column(columnDefinition = "text")
     var notes: String?,
 
-    // TODO: brendon -> rivedere i cascade types, problemi con le transazioni
-    @OneToOne(fetch = FetchType.EAGER)
+    @OneToOne(
+        cascade = [CascadeType.MERGE, CascadeType.PERSIST, CascadeType.DETACH, CascadeType.REFRESH],
+        fetch = FetchType.EAGER
+    )
     @JoinColumn(referencedColumnName = "id", name = "contact_id", foreignKey = ForeignKey())
     var contact: Contact,
 ) : BaseEntity() {
@@ -48,6 +52,7 @@ class Professional(
             contact = contact,
             jobOffer = null
         ).apply {
+            contact.category = ContactCategory.Professional
             contact.professional = this
         }
     }
