@@ -38,7 +38,7 @@ class Contact(
     @OneToOne(mappedBy = "contact")
     var customer: Customer?,
 
-    @OneToOne(mappedBy = "contact", fetch = FetchType.LAZY)
+    @OneToOne(cascade = [CascadeType.ALL], fetch = FetchType.LAZY, mappedBy = "contact")
     var professional: Professional?
 
 ) : BaseEntity() {
@@ -154,9 +154,5 @@ class Contact(
         this.addresses = other.addresses.onEach { address -> address.contacts.add(this@Contact) }
         this.customer = other.customer?.apply { this.contact = this@Contact }
         this.professional = other.professional?.apply { this.contact = this@Contact }
-    }
-
-    fun isAnonymous(): Boolean {
-        return this.category == ContactCategory.Unknown
     }
 }

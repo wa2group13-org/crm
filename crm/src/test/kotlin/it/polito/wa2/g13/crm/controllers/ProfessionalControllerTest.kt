@@ -1,6 +1,7 @@
 package it.polito.wa2.g13.crm.controllers
 
 import it.polito.wa2.g13.crm.IntegrationTest
+import it.polito.wa2.g13.crm.data.contact.ContactCategory
 import it.polito.wa2.g13.crm.dtos.CreateContactDTO
 import it.polito.wa2.g13.crm.dtos.CreateProfessionalDTO
 import it.polito.wa2.g13.crm.dtos.ProfessionalDTO
@@ -34,7 +35,7 @@ class ProfessionalControllerTest : IntegrationTest() {
     @Autowired
     private lateinit var professionalService: ProfessionalService
 
-    private val contacts = randomContacts(10, 5)
+    private val contacts = randomContacts(10, 5).map { it.copy(category = ContactCategory.Unknown) }
     private val professionals = mutableListOf<CreateProfessionalDTO>()
     private val professionalIds = mutableListOf<Long>()
 
@@ -57,7 +58,7 @@ class ProfessionalControllerTest : IntegrationTest() {
     }
 
     fun newProfessional(): Pair<CreateProfessionalDTO, CreateContactDTO> {
-        val contact = randomContacts(1, 5)[0]
+        val contact = randomContacts(1, 5)[0].copy(category = ContactCategory.Unknown)
         val contactId = contactService.createContact(contact)
         return Pair(randomProfessional(contactId, 5), contact)
     }

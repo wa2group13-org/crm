@@ -12,4 +12,14 @@ sealed class ProfessionalException(override val message: String, override val ca
             )
         }
     }
+
+    data class InvalidContactState(override val message: String, override val cause: Throwable? = null) :
+        ProfessionalException(message, cause) {
+        companion object {
+            @JvmStatic
+            fun from(contactId: Long): InvalidContactState = InvalidContactState(
+                message = "Tried to assign Contact@$contactId to Professional, but it is already taken!"
+            )
+        }
+    }
 }

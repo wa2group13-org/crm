@@ -1,5 +1,6 @@
 package it.polito.wa2.g13.crm.services
 
+import it.polito.wa2.g13.crm.data.contact.ContactCategory
 import it.polito.wa2.g13.crm.data.professional.EmploymentState
 import it.polito.wa2.g13.crm.data.professional.Professional
 import it.polito.wa2.g13.crm.dtos.CreateProfessionalDTO
@@ -33,7 +34,27 @@ class ProfessionalServiceImpl(
                 professionalDto.contactId
             )
 
+        if (contact.category != ContactCategory.Unknown)
+            throw ProfessionalException.InvalidContactState.from(contact.id)
+
         return Professional.from(professionalDto, contact)
+    }
+
+    private fun updateProfessionalEntity(professional: Professional, professionalDto: CreateProfessionalDTO) {
+        val contact =
+            contactRepository.findById(professionalDto.contactId).nullable() ?: throw ContactException.NotFound.from(
+                professionalDto.contactId
+            )
+
+        val newProfessional = if (contact != professional.contact) {
+            // Trying to assign a new contact to the professional
+            createProfessionalEntity(professionalDto)
+        } else {
+            // Only update the other fields except for the contact
+            Professional.from(professionalDto, contact)
+        }
+
+        professional.update(newProfessional)
     }
 
     override fun getProfessionals(
@@ -69,9 +90,7 @@ class ProfessionalServiceImpl(
     override fun updateProfessional(id: Long, professionalDto: CreateProfessionalDTO): Long? {
         val professional = professionalRepository.findById(id).nullable() ?: return createProfessional(professionalDto)
 
-        val newProfessional = createProfessionalEntity(professionalDto)
-
-        professional.update(newProfessional)
+        updateProfessionalEntity(professional, professionalDto)
 
         professionalRepository.save(professional)
 
@@ -81,10 +100,13 @@ class ProfessionalServiceImpl(
     }
 
     override fun deleteProfessional(id: Long) {
-        if (!professionalRepository.existsById(id))
-            throw ProfessionalException.NotFound.from(id)
+        val professional = professionalRepository.findById(id).nullable()
+            ?: throw ProfessionalException.NotFound.from(id)
 
-        professionalRepository.deleteById(id)
+        professional.contact.category = ContactCategory.Unknown
+        professional.contact.professional = null
+
+        professionalRepository.delete(professional)
     }
 
     override fun updateProfessionalNotes(id: Long, notesDto: String) {
