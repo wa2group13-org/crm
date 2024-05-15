@@ -330,3 +330,18 @@ Content-Type: application/json
 
 ### justtest
 GET http://localhost:8080/API/customers/1
+
+### create a job offer (expected 201)
+POST http://localhost:8080/API/joboffers
+Content-Type: application/json
+
+{
+  "customerId": 1,
+  "description": "First joboffer",
+  "status": "Created",
+  "duration": 23,
+  "skills": [
+    "IT",
+    "Cloud"
+  ]
+}
