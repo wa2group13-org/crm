@@ -45,9 +45,9 @@ class ProfessionalControllerTest : IntegrationTest() {
         professionals.clear()
 
         contacts.forEach { contact ->
-            val contactId = contactService.createContact(contact)
+            val contactDTO = contactService.createContact(contact)
 
-            val professional = randomProfessional(contactId, 5)
+            val professional = randomProfessional(contactDTO.id, 5)
             professionals.add(professional)
 
             val id = professionalService.createProfessional(professional)
@@ -59,8 +59,8 @@ class ProfessionalControllerTest : IntegrationTest() {
 
     fun newProfessional(): Pair<CreateProfessionalDTO, CreateContactDTO> {
         val contact = randomContacts(1, 5)[0].copy(category = ContactCategory.Unknown)
-        val contactId = contactService.createContact(contact)
-        return Pair(randomProfessional(contactId, 5), contact)
+        val contactDTO = contactService.createContact(contact)
+        return Pair(randomProfessional(contactDTO.id, 5), contact)
     }
 
 
