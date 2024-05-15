@@ -44,7 +44,7 @@ class ProfessionalServiceImplTest : IntegrationTest() {
                 val professional = randomProfessional(contactDTO.id, 5)
                 _professionals.add(professional)
 
-                val professionalId = professionalService.createProfessional(professional)
+                val professionalId = professionalService.createProfessional(professional).id
                 _professionalsId.add(professionalId)
             }
 
@@ -68,7 +68,7 @@ class ProfessionalServiceImplTest : IntegrationTest() {
     fun `creating a new professional should modify also the contact`() {
         val (professional, _) = newProfessional()
 
-        val professionalId = professionalService.createProfessional(professional)
+        val professionalId = professionalService.createProfessional(professional).id
 
         val p = professionalService.getProfessional(professionalId)
         val c = contactService.getContactById(p.contact.id)

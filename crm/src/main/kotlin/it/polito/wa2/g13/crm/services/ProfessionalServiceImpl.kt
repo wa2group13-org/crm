@@ -70,14 +70,14 @@ class ProfessionalServiceImpl(
             .map { ProfessionalDTO.from(it) }
     }
 
-    override fun createProfessional(professionalDto: CreateProfessionalDTO): Long {
+    override fun createProfessional(professionalDto: CreateProfessionalDTO): ProfessionalDTO {
         val professional = createProfessionalEntity(professionalDto)
 
         val saveProfessional = professionalRepository.save(professional)
 
         logger.info("${::createProfessional.name}: Created Professional@${saveProfessional.id}")
 
-        return saveProfessional.id
+        return ProfessionalDTO.from(saveProfessional)
     }
 
     override fun getProfessional(id: Long): ProfessionalDTO {
@@ -87,7 +87,7 @@ class ProfessionalServiceImpl(
         return ProfessionalDTO.from(professional)
     }
 
-    override fun updateProfessional(id: Long, professionalDto: CreateProfessionalDTO): Long? {
+    override fun updateProfessional(id: Long, professionalDto: CreateProfessionalDTO): ProfessionalDTO? {
         val professional = professionalRepository.findById(id).nullable() ?: return createProfessional(professionalDto)
 
         updateProfessionalEntity(professional, professionalDto)

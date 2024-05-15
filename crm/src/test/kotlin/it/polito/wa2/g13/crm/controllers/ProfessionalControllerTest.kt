@@ -50,8 +50,8 @@ class ProfessionalControllerTest : IntegrationTest() {
             val professional = randomProfessional(contactDTO.id, 5)
             professionals.add(professional)
 
-            val id = professionalService.createProfessional(professional)
-            professionalIds.add(id)
+            val newProfessional = professionalService.createProfessional(professional)
+            professionalIds.add(newProfessional.id)
         }
 
         logger.info("Initialized DB")
@@ -106,7 +106,7 @@ class ProfessionalControllerTest : IntegrationTest() {
         val (professional, _) = newProfessional()
 
         val professionalId = restClient
-            .exchange<Unit>(
+            .exchange<ProfessionalDTO>(
                 RequestEntity.post("/API/professionals").body(professional, CreateProfessionalDTO::class.java)
             )
             .headers
@@ -160,7 +160,7 @@ class ProfessionalControllerTest : IntegrationTest() {
     fun `updating a professional that doesn't exist should create a new one`() {
         val (newProfessional, _) = newProfessional()
         val newId = restClient
-            .exchange<Unit>(
+            .exchange<ProfessionalDTO>(
                 RequestEntity.put("/API/professionals/-1").body(newProfessional, CreateProfessionalDTO::class.java)
             )
             .headers
