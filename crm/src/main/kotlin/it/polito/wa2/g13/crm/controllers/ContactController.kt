@@ -36,10 +36,8 @@ class ContactController(
     fun createContact(
         request: HttpServletRequest,
         @RequestBody @Valid contact: CreateContactDTO,
-    ): ResponseEntity<Unit> {
-        val id = contactService.createContact(contact)
-
-        return ResponseEntity.created(URI.create("${request.requestURI}/$id")).build()
+    ): ContactDTO {
+        return contactService.createContact(contact)
     }
 
     @GetMapping("/{contactId}")
@@ -54,7 +52,7 @@ class ContactController(
         @PathVariable("contactId") contactId: Long,
         @Valid @RequestBody contact: CreateContactDTO
     ): ResponseEntity<Unit> {
-        val newId = contactService.updateContact(contactId, contact)
+        val contactDTO = contactService.updateContact(contactId, contact)
 
         return if (newId != null) {
             val contactURI = URI.create("${request.requestURIDropLast(1)}/$newId")

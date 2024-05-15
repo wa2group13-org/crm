@@ -266,14 +266,14 @@ class ContactServiceImpl(
             ?: throw ContactException.NotFound.from(id)
     }
 
-    override fun createContact(contactDto: CreateContactDTO): Long {
+    override fun createContact(contactDto: CreateContactDTO): ContactDTO {
         val contact = createContactEntity(contactDto)
 
         val saveContact = contactRepository.save(contact)
 
         logger.info("Created Contact with id: ${saveContact.id}")
 
-        return saveContact.id
+        return ContactDTO.from(saveContact)
     }
 
     override fun deleteContactById(id: Long) {
@@ -460,16 +460,13 @@ class ContactServiceImpl(
         )
     }
 
-    override fun updateContact(contactId: Long, contactDto: CreateContactDTO): Long? {
+    override fun updateContact(contactId: Long, contactDto: CreateContactDTO): ContactDTO {
         val contact = contactRepository.findById(contactId).nullable() ?: return createContact(contactDto)
         val newContact = createContactEntity(contactDto)
-
         contact.update(newContact)
-
-        contactRepository.save(newContact)
 
         logger.info("updateContact: Updated Contact@$contactId")
 
-        return null
+        return ContactDTO.from(contact)
     }
 }

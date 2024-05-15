@@ -133,8 +133,8 @@ POST http://localhost:8080/API/contacts
 Content-Type: application/json
 
 {
-  "name": "name1",
-  "surname": "surname1",
+  "name": "dio",
+  "surname": "cane",
   "category": "Unknown",
   "telephones": [],
   "emails": [],
@@ -156,12 +156,12 @@ GET http://localhost:8080/API/contacts/invalidid
 GET http://localhost:8080/API/contacts/2
 
 ### Update contact, absent id: expected 201
-PUT http://localhost:8080/API/contacts/-1
+PUT http://localhost:8080/API/contacts/3
 Content-Type: application/json
 
 {
-  "name": "name2",
-  "surname": "surname2",
+  "name": "ale2",
+  "surname": "ciullo2",
   "category": "Unknown",
   "telephones": [],
   "emails": [],
