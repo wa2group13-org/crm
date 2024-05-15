@@ -14,6 +14,6 @@ interface JobOfferService {
 
     fun getNoteById(jobOfferId: Long, noteId: Long): JobOfferHistoryDTO
     fun getNotesByJobOfferId(id: Long): List<JobOfferHistoryDTO>
-    fun addNoteByJobOfferId(id: Long, note: CreateJobOfferHistoryDTO): JobOfferHistoryDTO
-    fun updateNoteById(jobOfferId: Long, noteId: Long, note: String?): JobOfferHistoryDTO
+    fun addNoteByJobOfferId(id: Long, note: CreateJobOfferHistoryNoteDTO): JobOfferHistoryDTO
+    fun updateNoteById(jobOfferId: Long, noteId: Long, note: CreateJobOfferHistoryNoteDTO): JobOfferHistoryDTO
 }

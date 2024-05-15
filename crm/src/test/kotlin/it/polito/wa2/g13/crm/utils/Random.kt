@@ -114,12 +114,12 @@ fun randomCustomers(contacts: List<ContactDTO>/*, randomRelations: Int?*/): List
     .map { randomCustomer(it/*, randomRelations*/) }
     .toList()
 
-fun randomJobOfferHistory(assignedProfessional: Long?, currentStatus: JobOfferStatus): CreateJobOfferHistoryDTO =
-    CreateJobOfferHistoryDTO(
-        assignedProfessional = assignedProfessional,
-        currentStatus = currentStatus,
-        note = UUID.randomUUID().toString(),
-    )
+//fun randomJobOfferHistory(assignedProfessional: Long?, currentStatus: JobOfferStatus): CreateJobOfferHistoryDTO =
+//    CreateJobOfferHistoryDTO(
+//        assignedProfessional = assignedProfessional,
+//        currentStatus = currentStatus,
+//        note = UUID.randomUUID().toString(),
+//    )
 
 fun randomSkills(n: Int): List<CreateSkillDTO> {
     return n.let {

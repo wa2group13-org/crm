@@ -5,12 +5,12 @@ import it.polito.wa2.g13.crm.data.joboffer.JobOfferHistory
 import it.polito.wa2.g13.crm.data.joboffer.JobOfferStateMachine
 import it.polito.wa2.g13.crm.data.joboffer.JobOfferStatus
 import it.polito.wa2.g13.crm.data.professional.EmploymentState
-import it.polito.wa2.g13.crm.data.professional.Professional
 import it.polito.wa2.g13.crm.dtos.*
 import it.polito.wa2.g13.crm.exceptions.CustomerException
 import it.polito.wa2.g13.crm.exceptions.JobOfferException
 import it.polito.wa2.g13.crm.exceptions.ProfessionalException
 import it.polito.wa2.g13.crm.repositories.CustomerRepository
+import it.polito.wa2.g13.crm.repositories.JobOfferHistoryRepository
 import it.polito.wa2.g13.crm.repositories.JobOfferRepository
 import it.polito.wa2.g13.crm.repositories.ProfessionalRepository
 import it.polito.wa2.g13.crm.utils.nullable
@@ -26,7 +26,8 @@ import java.time.OffsetDateTime
 class JobOfferServiceImpl(
     private val jobOfferRepository: JobOfferRepository,
     private val professionalRepository: ProfessionalRepository,
-    private val customerRepository: CustomerRepository
+    private val customerRepository: CustomerRepository,
+    private val jobOfferHistoryRepository: JobOfferHistoryRepository
 ) : JobOfferService {
     companion object {
         private val logger = LoggerFactory.getLogger(JobOfferServiceImpl::class.java)
@@ -62,6 +63,15 @@ class JobOfferServiceImpl(
             skills = createJobOfferDTO.skills.map { it.skill }.toMutableSet(),
             notes = mutableSetOf()
         )
+        val note = JobOfferHistory(
+            jobOffer,
+            assignedProfessional = null,
+            logTime = OffsetDateTime.now(),
+            currentStatus = jobOffer.status,
+            note = "System Created"
+        )
+        jobOffer.notes.add(note)
+
         jobOfferRepository.save(jobOffer)
         logger.info("JobOffer ${jobOffer.id} created")
         return JobOfferDTO.from(jobOffer)
@@ -150,27 +160,28 @@ class JobOfferServiceImpl(
         }.sortedByDescending { it.logTime }
     }
 
-    override fun addNoteByJobOfferId(id: Long, note: CreateJobOfferHistoryDTO): JobOfferHistoryDTO {
+    override fun addNoteByJobOfferId(id: Long, note: CreateJobOfferHistoryNoteDTO): JobOfferHistoryDTO {
         val jobOffer = jobOfferRepository.findById(id).nullable() ?: throw JobOfferException.NotFound.from(id)
-        var assignedProfessional: Professional? = null
-        if (note.assignedProfessional != null) {
-            assignedProfessional = professionalRepository.findById(note.assignedProfessional).nullable()
-                ?: throw ProfessionalException.NotFound.from(note.assignedProfessional)
-        }
+
         val addedNote = JobOfferHistory(
             jobOffer,
-            assignedProfessional,
+            jobOffer.professional,
             OffsetDateTime.now(),
             jobOffer.status,
             note.note
         )
         jobOffer.notes.add(addedNote)
-        jobOfferRepository.save(jobOffer)
-        logger.info("Note ${addedNote.id} added to JobOffer ${jobOffer.id}")
-        return JobOfferHistoryDTO.from(addedNote)
+        val newNote = jobOfferHistoryRepository.save(addedNote)
+        val newJobOffer = jobOfferRepository.save(jobOffer)
+        logger.info("Note ${newNote.id} added to JobOffer ${newJobOffer.id}")
+        return JobOfferHistoryDTO.from(newNote)
     }
 
-    override fun updateNoteById(jobOfferId: Long, noteId: Long, note: String?): JobOfferHistoryDTO {
+    override fun updateNoteById(
+        jobOfferId: Long,
+        noteId: Long,
+        note: CreateJobOfferHistoryNoteDTO
+    ): JobOfferHistoryDTO {
         val jobOffer =
             jobOfferRepository.findById(jobOfferId).nullable() ?: throw JobOfferException.NotFound.from(jobOfferId)
 
@@ -180,7 +191,7 @@ class JobOfferServiceImpl(
             throw JobOfferException.NoteNotFound.from(noteId)
         }
 
-        noteUpdated.note = note
+        noteUpdated.note = note.note
         jobOfferRepository.save(jobOffer)
 
         logger.info("Note ${noteUpdated.id} updated")

@@ -3,10 +3,7 @@ package it.polito.wa2.g13.crm.services
 import it.polito.wa2.g13.crm.IntegrationTest
 import it.polito.wa2.g13.crm.data.contact.ContactCategory
 import it.polito.wa2.g13.crm.data.joboffer.JobOfferStatus
-import it.polito.wa2.g13.crm.dtos.CreateJobOfferDTO
-import it.polito.wa2.g13.crm.dtos.JobOfferFilters
-import it.polito.wa2.g13.crm.dtos.UpdateJobOfferDetailsDTO
-import it.polito.wa2.g13.crm.dtos.UpdateJobOfferStatusDTO
+import it.polito.wa2.g13.crm.dtos.*
 import it.polito.wa2.g13.crm.utils.*
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -202,9 +199,82 @@ class JobOfferServiceImplTest : IntegrationTest() {
 
         val result = jobOfferService.getJobOffersByParams(null, 0, 10)
 
-        assertEquals(1, result.content.size)
-        assertThat(CreateJobOfferDTO.from(result.content[0])).usingRecursiveComparison()
-            .isEqualTo(jobOffers[randomId.toInt()])
+        assertRecursive(
+            jobOffers.zip(ids).filter { it.second != randomId }.map { it.first },
+            result.content.map { CreateJobOfferDTO.from(it) })
+
     }
 
+    // FROM NOW ON TESTS FOR JOB OFFER HISTORY
+    @Test
+    fun `should retrieve a list of job offer history`() {
+        val (ids, _) = initJobOffers(2)
+        val randomId = ids.random()
+
+        val updateJobOfferStatusDTO1 = UpdateJobOfferStatusDTO(JobOfferStatus.SelectionPhase, null, null)
+        val updateJobOfferStatusDTO2 = UpdateJobOfferStatusDTO(JobOfferStatus.CandidateProposal, null, null)
+
+        jobOfferService.updateJobOfferStatus(randomId, updateJobOfferStatusDTO1)
+        jobOfferService.updateJobOfferStatus(randomId, updateJobOfferStatusDTO2)
+
+        val result = jobOfferService.getNotesByJobOfferId(randomId)
+
+        assertEquals(3, result.size)
+    }
+
+    @Test
+    fun `should retrieve a note given its id`() {
+        val (ids, _) = initJobOffers(3)
+        val randomId = ids.random()
+
+        val updateJobOfferStatusDTO1 = UpdateJobOfferStatusDTO(JobOfferStatus.SelectionPhase, null, null)
+        val updateJobOfferStatusDTO2 = UpdateJobOfferStatusDTO(JobOfferStatus.CandidateProposal, null, null)
+
+        jobOfferService.updateJobOfferStatus(randomId, updateJobOfferStatusDTO1)
+        jobOfferService.updateJobOfferStatus(randomId, updateJobOfferStatusDTO2)
+
+        val notes = jobOfferService.getNotesByJobOfferId(randomId)
+
+        notes.forEach {
+            val result = jobOfferService.getNoteById(randomId, it.id)
+            assertEquals(it, result)
+        }
+    }
+
+    @Test
+    fun `should add a note given job offer id`() {
+        val (ids, _) = initJobOffers(3)
+        val randomId = ids.random()
+
+        val createJobOfferHistoryNoteDTO = CreateJobOfferHistoryNoteDTO(
+            "Selection Phase"
+        )
+
+        val addedNote = jobOfferService.addNoteByJobOfferId(randomId, createJobOfferHistoryNoteDTO)
+        val result = jobOfferService.getNotesByJobOfferId(randomId)
+        val note = jobOfferService.getNoteById(randomId, addedNote.id)
+
+        assertEquals(2, result.size)
+        assertEquals(addedNote, note)
+    }
+
+    @Test
+    fun `should update an existent note given its id`() {
+        val (ids, _) = initJobOffers(3)
+        val randomId = ids.random()
+
+        val createJobOfferHistoryNoteDTO = CreateJobOfferHistoryNoteDTO(
+            "Created and modified"
+        )
+        val note = jobOfferService.getNotesByJobOfferId(randomId).first()
+        val updated = jobOfferService.updateNoteById(randomId, note.id, createJobOfferHistoryNoteDTO)
+        val updatedNote = jobOfferService.getNoteById(randomId, note.id)
+
+        assertThat(updatedNote)
+            .usingRecursiveComparison()
+            .ignoringFields("note")
+            .isEqualTo(note)
+        assertEquals(updated, updatedNote)
+
+    }
 }
