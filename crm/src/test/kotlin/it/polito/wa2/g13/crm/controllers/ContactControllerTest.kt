@@ -20,6 +20,8 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.client.TestRestTemplate
 import org.springframework.boot.test.web.client.exchange
+import org.springframework.http.HttpStatus
+import org.springframework.http.ProblemDetail
 import org.springframework.http.RequestEntity
 import org.springframework.test.context.jdbc.Sql
 
@@ -76,34 +78,16 @@ class ContactControllerTest : IntegrationTest() {
     }
 
     @Test
-    fun `update should create a new entity if it doesn't exist`() {
+    fun `update should return 404 if id doesn't exist`() {
         val newContact = randomContacts(1, 4)[0]
 
-        val updateRes = restClient.exchange<Unit>(
+        val updateRes = restClient.exchange<ProblemDetail>(
             RequestEntity
                 .put("/API/contacts/-1")
                 .body(newContact, CreateContactDTO::class.java)
         )
 
-        assertNotEquals(null, updateRes.headers.location)
-
-        val newIndex = updateRes.headers.location!!.toString().split("/").last().toLong()
-
-        val updatedContact = restClient.exchange<ContactDTO>(
-            RequestEntity
-                .get("/API/contacts/$newIndex")
-                .build()
-        )
-            .body
-
-        Assertions.assertThat(updatedContact?.let { CreateContactDTO.from(it) })
-            .usingRecursiveComparison(
-                RecursiveComparisonConfiguration
-                    .builder()
-                    .withIgnoreCollectionOrder(true)
-                    .build()
-            )
-            .isEqualTo(newContact)
+        assertEquals(HttpStatus.NOT_FOUND, updateRes.statusCode)
     }
 
     @Test

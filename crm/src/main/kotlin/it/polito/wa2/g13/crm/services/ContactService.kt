@@ -30,7 +30,7 @@ interface ContactService {
      *
      * @return return the id of the new [it.polito.wa2.g13.crm.data.contact.Contact]
      */
-    fun createContact(contactDto: CreateContactDTO): Long
+    fun createContact(contactDto: CreateContactDTO): ContactDTO
 
     /**
      * Delete a contact by [id].
@@ -86,5 +86,5 @@ interface ContactService {
     fun deleteContactAddressById(contactId: Long, addressId: Long)
 
     @Throws(ContactException.NotFound::class)
-    fun updateContact(contactId: Long, contactDto: CreateContactDTO): Long?
+    fun updateContact(contactId: Long, contactDto: CreateContactDTO): ContactDTO
 }
