@@ -55,7 +55,7 @@ class JobOfferServiceImplTest : IntegrationTest() {
         val contactsPIds = contactsP.map { contactService.createContact(it) }.toList()
 
         val customerIds = contactsCIds.map { customerService.createCustomer(it).id }
-        val professionalIds = contactsPIds.map {
+        val newProfessionals = contactsPIds.map {
             professionalService.createProfessional(
                 // A professional should be available in order to be assigned to a jobOffer
                 randomProfessional(
@@ -68,10 +68,10 @@ class JobOfferServiceImplTest : IntegrationTest() {
         val jobOffers = randomJobOffers(customerIds, n, JobOfferStatus.CandidateProposal)
         val jobOffersIds = jobOffers.map { jobOfferService.createJobOffer(it).id }.toMutableList()
 
-        jobOffersIds.zip(professionalIds).forEach {
+        jobOffersIds.zip(newProfessionals).forEach {
             jobOfferService.updateJobOfferStatus(
                 it.first,
-                UpdateJobOfferStatusDTO(JobOfferStatus.Consolidated, it.second, "Candidate Consolidated!")
+                UpdateJobOfferStatusDTO(JobOfferStatus.Consolidated, it.second.id, "Candidate Consolidated!")
             )
         }
 
@@ -81,14 +81,13 @@ class JobOfferServiceImplTest : IntegrationTest() {
         return Pair(jobOffersIds, jobOfferDTOs)
     }
 
-    private fun initProfessional(randomRelations: Int): Pair<Long, CreateProfessionalDTO> {
+    private fun initProfessional(randomRelations: Int): ProfessionalDTO {
         val contact = randomContacts(1, randomRelations)[0].copy(category = ContactCategory.Unknown)
         val contactId = contactService.createContact(contact)
         // A contact should be available in order to be assigned to a jobOffer
         val professional =
             randomProfessional(contactId, randomRelations).copy(employmentState = EmploymentState.Available)
-        val professionalId = professionalService.createProfessional(professional)
-        return Pair(professionalId, professional)
+        return professionalService.createProfessional(professional)
     }
 
     private fun initCandidateProposalJobOffers(randomRelations: Int): Pair<List<Long>, List<CreateJobOfferDTO>> {
@@ -344,7 +343,7 @@ class JobOfferServiceImplTest : IntegrationTest() {
     @Test
     fun `updating the status of a job offer to consolidated with a professional that is already assigned should throw`() {
         val (jobOfferIds, _) = initCandidateProposalJobOffers(2)
-        val (professionalId, _) = initProfessional(5)
+        val professionalId = initProfessional(5).id
 
         // Assign the professional to the first job offer
         jobOfferService.updateJobOfferStatus(
@@ -363,8 +362,8 @@ class JobOfferServiceImplTest : IntegrationTest() {
     @Test
     fun `updating the status of a job offer from consolidated to done without the same professional should throw`() {
         val (jobOfferIds, _) = initCandidateProposalJobOffers(1)
-        val (professionalId, _) = initProfessional(5)
-        val (availableProfessionalId, _) = initProfessional(5)
+        val professionalId = initProfessional(5).id
+        val availableProfessionalId = initProfessional(5).id
 
         // Assign the professional to the first job offer
         jobOfferService.updateJobOfferStatus(
@@ -390,7 +389,7 @@ class JobOfferServiceImplTest : IntegrationTest() {
     @Test
     fun `updating the status of a job offer from consolidated to abort with a non-null professional should throw`() {
         val (jobOfferIds, _) = initCandidateProposalJobOffers(1)
-        val (professionalId, _) = initProfessional(5)
+        val professionalId = initProfessional(5).id
 
         // Assign the professional to the first job offer
         jobOfferService.updateJobOfferStatus(
@@ -418,7 +417,7 @@ class JobOfferServiceImplTest : IntegrationTest() {
     @Test
     fun `updating the status of a job offer from consolidated to selectionPhase with a non-null professional should throw`() {
         val (jobOfferIds, _) = initCandidateProposalJobOffers(1)
-        val (professionalId, _) = initProfessional(4)
+        val professionalId = initProfessional(4).id
 
         // Assign the professional to the first job offer
         jobOfferService.updateJobOfferStatus(
