@@ -13,7 +13,7 @@ class JobOfferHistory(
     @JoinColumn(referencedColumnName = "id", name = "job_offer_id", foreignKey = ForeignKey())
     var jobOffer: JobOffer,
 
-    @OneToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     var assignedProfessional: Professional?,
 
     @Temporal(TemporalType.TIMESTAMP)

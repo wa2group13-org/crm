@@ -3,8 +3,8 @@ package it.polito.wa2.g13.crm.services
 import it.polito.wa2.g13.crm.data.joboffer.JobOffer
 import it.polito.wa2.g13.crm.data.joboffer.JobOfferHistory
 import it.polito.wa2.g13.crm.data.joboffer.JobOfferStateMachine
-import it.polito.wa2.g13.crm.data.joboffer.JobOfferStatus
 import it.polito.wa2.g13.crm.data.professional.EmploymentState
+import it.polito.wa2.g13.crm.data.professional.Professional
 import it.polito.wa2.g13.crm.dtos.*
 import it.polito.wa2.g13.crm.exceptions.CustomerException
 import it.polito.wa2.g13.crm.exceptions.JobOfferException
@@ -96,41 +96,57 @@ class JobOfferServiceImpl(
 
         //check if the transition is feasible according to the state machine
         val isTargetStateFeasible =
-            JobOfferStateMachine(jobOffer.status).isStatusFeasible(updateJobOfferStatusDTO.status)
-        if (!isTargetStateFeasible)
+            JobOfferStateMachine(
+                jobOffer.status,
+                jobOffer.professional?.id
+            ).isStatusFeasible(updateJobOfferStatusDTO.status, updateJobOfferStatusDTO.professionalId)
+
+        if (!isTargetStateFeasible) {
+            logger.error("${::updateJobOfferDetails.name}: The transition from ${jobOffer.status} to ${updateJobOfferStatusDTO.status} was not possible!")
             throw JobOfferException.ForbiddenTargetStatus.from(
                 jobOffer.status,
                 updateJobOfferStatusDTO.status
             )
+        }
 
-        //change the professional state.
+        // Check that the professional is in Available state
+        professional?.employmentState?.let {
+            if (it != EmploymentState.Available && professional != jobOffer.professional) {
+                logger.error("Tried to assign ${Professional::class.qualifiedName}@${professional.id} to ${JobOffer::class.qualifiedName}@${jobOffer.id}, but it was already assigned!")
+                throw JobOfferException.IllegalProfessionalState.from(jobOffer.id, professional.id)
+            }
+        }
+
+        // When we reach this point we are sure that the professional can be
+        // assigned or removed from the jobOffer
         if (professional != null) {
             //when the status is Consolidated, a Professional must be present
-            if (updateJobOfferStatusDTO.status == JobOfferStatus.Consolidated) {
-                jobOffer.professional = professional
-                professional.employmentState = EmploymentState.Employed
-                logger.info("professional ${professional.id} assigned to JobOffer ${jobOffer.id}")
-            }
+            jobOffer.professional = professional
+            professional.jobOffer = jobOffer
+            professional.employmentState = EmploymentState.Employed
+            logger.info("${Professional::class.qualifiedName}@${professional.id} assigned to ${JobOffer::class.qualifiedName}@${jobOffer.id}")
+        } else {
             //modelling the "rollback" of the state machine from (Consolidated, Done, CandidateProposal??)
-            else if (updateJobOfferStatusDTO.status == JobOfferStatus.SelectionPhase &&
-                jobOffer.status != JobOfferStatus.Created
-            ) {
-                jobOffer.professional = null
-                professional.employmentState = EmploymentState.Available
-                logger.info("JobOffer ${jobOffer.id} professional ${professional.id} removed")
+            jobOffer.professional?.apply {
+                this.employmentState = EmploymentState.Available
+                this.jobOffer = null
+                logger.info("Removed ${Professional::class.qualifiedName}@${this.id} from ${JobOffer::class.qualifiedName}@${jobOffer.id}")
             }
-            professionalRepository.save(professional)
+            jobOffer.professional = null
         }
+
         jobOffer.status = updateJobOfferStatusDTO.status
 
         val note = JobOfferHistory(
             jobOffer,
-            assignedProfessional = professional,
+            assignedProfessional = jobOffer.professional,
             logTime = OffsetDateTime.now(),
             currentStatus = jobOffer.status,
             note = updateJobOfferStatusDTO.note
         )
         jobOffer.notes.add(note)
+        jobOffer.professional?.jobOfferHistory?.add(note)
+
         jobOfferRepository.save(jobOffer)
 
         logger.info("JobOffer ${jobOffer.id} status changed to ${jobOffer.status}")

@@ -3,11 +3,16 @@ package it.polito.wa2.g13.crm.services
 import it.polito.wa2.g13.crm.IntegrationTest
 import it.polito.wa2.g13.crm.data.contact.ContactCategory
 import it.polito.wa2.g13.crm.data.joboffer.JobOfferStatus
+import it.polito.wa2.g13.crm.data.professional.EmploymentState
 import it.polito.wa2.g13.crm.dtos.*
+import it.polito.wa2.g13.crm.exceptions.JobOfferException
+import it.polito.wa2.g13.crm.exceptions.ProfessionalException
 import it.polito.wa2.g13.crm.utils.*
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertDoesNotThrow
+import org.junit.jupiter.api.assertThrows
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -23,7 +28,6 @@ class JobOfferServiceImplTest : IntegrationTest() {
     @Autowired
     lateinit var contactService: ContactService
 
-    //    @Qualifier("customerService")
     @Autowired
     lateinit var customerService: CustomerService
 
@@ -51,7 +55,15 @@ class JobOfferServiceImplTest : IntegrationTest() {
         val contactsPIds = contactsP.map { contactService.createContact(it) }.toList()
 
         val customerIds = contactsCIds.map { customerService.createCustomer(it).id }
-        val professionalIds = contactsPIds.map { professionalService.createProfessional(randomProfessional(it, n)) }
+        val professionalIds = contactsPIds.map {
+            professionalService.createProfessional(
+                // A professional should be available in order to be assigned to a jobOffer
+                randomProfessional(
+                    it,
+                    n
+                ).copy(employmentState = EmploymentState.Available)
+            )
+        }
 
         val jobOffers = randomJobOffers(customerIds, n, JobOfferStatus.CandidateProposal)
         val jobOffersIds = jobOffers.map { jobOfferService.createJobOffer(it).id }.toMutableList()
@@ -69,6 +81,43 @@ class JobOfferServiceImplTest : IntegrationTest() {
         return Pair(jobOffersIds, jobOfferDTOs)
     }
 
+    private fun initProfessional(randomRelations: Int): Pair<Long, CreateProfessionalDTO> {
+        val contact = randomContacts(1, randomRelations)[0].copy(category = ContactCategory.Unknown)
+        val contactId = contactService.createContact(contact)
+        // A contact should be available in order to be assigned to a jobOffer
+        val professional =
+            randomProfessional(contactId, randomRelations).copy(employmentState = EmploymentState.Available)
+        val professionalId = professionalService.createProfessional(professional)
+        return Pair(professionalId, professional)
+    }
+
+    private fun initCandidateProposalJobOffers(randomRelations: Int): Pair<List<Long>, List<CreateJobOfferDTO>> {
+        val pair = initJobOffers(randomRelations)
+
+        pair.first.forEach { id ->
+            jobOfferService.updateJobOfferStatus(
+                id, UpdateJobOfferStatusDTO(
+                    status = JobOfferStatus.SelectionPhase,
+                    null,
+                    null,
+                )
+            )
+        }
+
+        pair.first.forEach { id ->
+            jobOfferService.updateJobOfferStatus(
+                id, UpdateJobOfferStatusDTO(
+                    status = JobOfferStatus.CandidateProposal,
+                    null,
+                    null,
+                )
+            )
+        }
+
+        logger.info("created $randomRelations jobOffers at CandidateProposal state")
+
+        return pair
+    }
 
     @Test
     fun `should retrieve all job offers`() {
@@ -276,5 +325,122 @@ class JobOfferServiceImplTest : IntegrationTest() {
             .isEqualTo(note)
         assertEquals(updated, updatedNote)
 
+    }
+
+    // --- JobOffer with Professional Test ---
+
+    @Test
+    fun `updating the status of job offer to consolidated with a professional that doesn't exist should throw`() {
+        val (jobOfferIds, _) = initCandidateProposalJobOffers(1)
+
+        assertThrows<ProfessionalException.NotFound> {
+            jobOfferService.updateJobOfferStatus(
+                jobOfferIds.first(),
+                UpdateJobOfferStatusDTO(JobOfferStatus.Consolidated, 0, null)
+            )
+        }
+    }
+
+    @Test
+    fun `updating the status of a job offer to consolidated with a professional that is already assigned should throw`() {
+        val (jobOfferIds, _) = initCandidateProposalJobOffers(2)
+        val (professionalId, _) = initProfessional(5)
+
+        // Assign the professional to the first job offer
+        jobOfferService.updateJobOfferStatus(
+            jobOfferIds[0],
+            UpdateJobOfferStatusDTO(JobOfferStatus.Consolidated, professionalId, null)
+        )
+
+        assertThrows<JobOfferException.IllegalProfessionalState> {
+            jobOfferService.updateJobOfferStatus(
+                jobOfferIds[1],
+                UpdateJobOfferStatusDTO(JobOfferStatus.Consolidated, professionalId, null)
+            )
+        }
+    }
+
+    @Test
+    fun `updating the status of a job offer from consolidated to done without the same professional should throw`() {
+        val (jobOfferIds, _) = initCandidateProposalJobOffers(1)
+        val (professionalId, _) = initProfessional(5)
+        val (availableProfessionalId, _) = initProfessional(5)
+
+        // Assign the professional to the first job offer
+        jobOfferService.updateJobOfferStatus(
+            jobOfferIds[0],
+            UpdateJobOfferStatusDTO(JobOfferStatus.Consolidated, professionalId, null)
+        )
+
+        assertThrows<JobOfferException.ForbiddenTargetStatus> {
+            jobOfferService.updateJobOfferStatus(
+                jobOfferIds[0],
+                UpdateJobOfferStatusDTO(JobOfferStatus.Done, availableProfessionalId, null)
+            )
+        }
+
+        assertThrows<JobOfferException.ForbiddenTargetStatus> {
+            jobOfferService.updateJobOfferStatus(
+                jobOfferIds[0],
+                UpdateJobOfferStatusDTO(JobOfferStatus.Done, null, null)
+            )
+        }
+    }
+
+    @Test
+    fun `updating the status of a job offer from consolidated to abort with a non-null professional should throw`() {
+        val (jobOfferIds, _) = initCandidateProposalJobOffers(1)
+        val (professionalId, _) = initProfessional(5)
+
+        // Assign the professional to the first job offer
+        jobOfferService.updateJobOfferStatus(
+            jobOfferIds[0],
+            UpdateJobOfferStatusDTO(JobOfferStatus.Consolidated, professionalId, null)
+        )
+
+        assertThrows<JobOfferException.ForbiddenTargetStatus> {
+            jobOfferService.updateJobOfferStatus(
+                jobOfferIds[0],
+                UpdateJobOfferStatusDTO(JobOfferStatus.Aborted, professionalId, null)
+            )
+        }
+
+        assertDoesNotThrow {
+            jobOfferService.updateJobOfferStatus(
+                jobOfferIds[0],
+                UpdateJobOfferStatusDTO(JobOfferStatus.Aborted, null, null)
+            )
+        }
+
+        assertEquals(JobOfferStatus.Aborted, jobOfferService.getJobOfferById(jobOfferIds[0]).status)
+    }
+
+    @Test
+    fun `updating the status of a job offer from consolidated to selectionPhase with a non-null professional should throw`() {
+        val (jobOfferIds, _) = initCandidateProposalJobOffers(1)
+        val (professionalId, _) = initProfessional(4)
+
+        // Assign the professional to the first job offer
+        jobOfferService.updateJobOfferStatus(
+            jobOfferIds[0],
+            UpdateJobOfferStatusDTO(JobOfferStatus.Consolidated, professionalId, null)
+        )
+
+        assertThrows<JobOfferException.ForbiddenTargetStatus> {
+            jobOfferService.updateJobOfferStatus(
+                jobOfferIds[0],
+                UpdateJobOfferStatusDTO(JobOfferStatus.SelectionPhase, professionalId, null)
+            )
+        }
+
+        assertDoesNotThrow {
+            jobOfferService.updateJobOfferStatus(
+                jobOfferIds[0],
+                UpdateJobOfferStatusDTO(JobOfferStatus.SelectionPhase, null, null)
+            )
+        }
+
+        assertEquals(EmploymentState.Available, professionalService.getProfessional(professionalId).employmentState)
+        assertEquals(JobOfferStatus.SelectionPhase, jobOfferService.getJobOfferById(jobOfferIds[0]).status)
     }
 }
