@@ -3,6 +3,8 @@ package it.polito.wa2.g13.crm.data.professional
 import it.polito.wa2.g13.crm.data.BaseEntity
 import it.polito.wa2.g13.crm.data.contact.Address
 import it.polito.wa2.g13.crm.data.contact.Contact
+import it.polito.wa2.g13.crm.data.joboffer.JobOffer
+import it.polito.wa2.g13.crm.data.joboffer.JobOfferHistory
 import it.polito.wa2.g13.crm.data.contact.ContactCategory
 import it.polito.wa2.g13.crm.dtos.CreateProfessionalDTO
 import it.polito.wa2.g13.crm.dtos.ProfessionalFilters
@@ -22,6 +24,12 @@ enum class EmploymentState {
 class Professional(
     @Enumerated
     var employmentState: EmploymentState,
+
+    @OneToOne(mappedBy = "professional", fetch = FetchType.LAZY)
+    var jobOffer: JobOffer?,
+
+    @OneToMany(mappedBy = "assignedProfessional", fetch = FetchType.LAZY)
+    var jobOfferHistory: MutableSet<JobOfferHistory>,
 
     var dailyRate: Double,
 
@@ -46,6 +54,8 @@ class Professional(
             skills = professional.skills.map { it.skill }.toMutableSet(),
             notes = professional.notes,
             contact = contact,
+            jobOffer = null,
+            jobOfferHistory = mutableSetOf(),
         ).apply {
             contact.category = ContactCategory.Professional
             contact.professional = this
@@ -127,5 +137,7 @@ class Professional(
         skills = professional.skills
         notes = professional.notes
         contact = professional.contact.apply { this.professional = this@Professional }
+        jobOffer = professional.jobOffer?.apply { this.professional = this@Professional }
+        jobOfferHistory = professional.jobOfferHistory.onEach { it.assignedProfessional = this@Professional }
     }
 }

@@ -36,11 +36,12 @@ class JobOffer(
     var notes: MutableSet<JobOfferHistory>,
     var duration: Long //duration in days
 ) : BaseEntity() {
-    @Transient
-    val value: Double? =
-        professional?.let {
-            duration * PROFIT_MARGIN * it.dailyRate
-        }
+    //    @Transient
+    val value: Double?
+        get() =
+            professional?.let {
+                duration * PROFIT_MARGIN * it.dailyRate
+            }
 
     fun update(updatedJobOffer: UpdateJobOfferDetailsDTO) {
         this.skills = updatedJobOffer.skills.map { it.skill }.toMutableSet()

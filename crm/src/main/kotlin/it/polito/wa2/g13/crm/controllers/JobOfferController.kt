@@ -76,16 +76,16 @@ class JobOfferController(
     @PostMapping("/{jobOfferId}/notes")
     fun addNoteByJobOfferId(
         @PathVariable jobOfferId: Long,
-        @RequestBody createJobOfferHistoryDTO: CreateJobOfferHistoryDTO
+        @RequestBody createJobOfferHistoryNoteDTO: CreateJobOfferHistoryNoteDTO
     ): JobOfferHistoryDTO {
-        return jobOfferService.addNoteByJobOfferId(jobOfferId, createJobOfferHistoryDTO)
+        return jobOfferService.addNoteByJobOfferId(jobOfferId, createJobOfferHistoryNoteDTO)
     }
 
     @PutMapping("/{jobOfferId}/notes/{noteId}")
     fun updateNoteById(
         @PathVariable jobOfferId: Long,
         @PathVariable noteId: Long,
-        @RequestBody note: String?
+        @RequestBody note: CreateJobOfferHistoryNoteDTO
     ): JobOfferHistoryDTO {
         return jobOfferService.updateNoteById(jobOfferId, noteId, note)
     }

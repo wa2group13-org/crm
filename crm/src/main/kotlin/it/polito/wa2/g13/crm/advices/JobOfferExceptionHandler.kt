@@ -26,6 +26,11 @@ class JobOfferExceptionHandler {
                 HttpStatus.BAD_REQUEST,
                 e.message
             )
+
+            is JobOfferException.IllegalProfessionalState -> ProblemDetail.forStatusAndDetail(
+                HttpStatus.BAD_REQUEST,
+                e.message
+            )
         }
 
     }
