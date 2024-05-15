@@ -462,9 +462,9 @@ class ContactServiceImpl(
 
     override fun updateContact(contactId: Long, contactDto: CreateContactDTO): ContactDTO {
         val contact =
-            contactRepository.findById(contactId).nullable() ?: throw ContactException.NotFound.from(contactId)
+            contactRepository.findById(contactId).nullable() ?: return createContact(contactDto)
         contact.update(createContactEntity(contactDto))
-
+        contactRepository.save(contact)
         logger.info("updateContact: Updated Contact@$contactId")
 
         return ContactDTO.from(contact)

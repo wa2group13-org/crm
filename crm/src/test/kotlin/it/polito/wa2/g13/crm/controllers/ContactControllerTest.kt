@@ -8,6 +8,7 @@ import it.polito.wa2.g13.crm.dtos.EmailDTO
 import it.polito.wa2.g13.crm.services.ContactService
 import it.polito.wa2.g13.crm.services.ContactServiceImplTest
 import it.polito.wa2.g13.crm.utils.ResultPage
+import it.polito.wa2.g13.crm.utils.assertRecursive
 import it.polito.wa2.g13.crm.utils.randomContacts
 import it.polito.wa2.g13.crm.utils.randomEmails
 import org.assertj.core.api.Assertions
@@ -78,16 +79,16 @@ class ContactControllerTest : IntegrationTest() {
     }
 
     @Test
-    fun `update should return 404 if id doesn't exist`() {
+    fun `update should create new contact if id doesn't exist`() {
         val newContact = randomContacts(1, 4)[0]
 
-        val updateRes = restClient.exchange<ProblemDetail>(
+        val updateRes = restClient.exchange<ContactDTO>(
             RequestEntity
                 .put("/API/contacts/-1")
                 .body(newContact, CreateContactDTO::class.java)
         )
 
-        assertEquals(HttpStatus.NOT_FOUND, updateRes.statusCode)
+        assertRecursive(newContact, updateRes.body?.let { CreateContactDTO.from(it) })
     }
 
     @Test

@@ -214,7 +214,7 @@ class CustomerControllerTest : IntegrationTest() {
     }
 
     @Test
-    fun `update customer contact with an illegal contact, expected 403` () {
+    fun `update customer contact with an already linked contact, expected 403` () {
         val customerId = customers[0].id
         val req = RequestEntity.put("/API/customers/$customerId/contact").body(ContactIdDTO(customers[1].contact.id))
         val res = restClient.exchange<ProblemDetail>(req)

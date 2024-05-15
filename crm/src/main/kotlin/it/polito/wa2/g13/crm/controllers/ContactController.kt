@@ -48,10 +48,9 @@ class ContactController(
 
     @PutMapping("/{contactId}")
     fun updateContact(
-        request: HttpServletRequest,
         @PathVariable("contactId") contactId: Long,
         @Valid @RequestBody contact: CreateContactDTO
-    ): ContactDTO{
+    ): ContactDTO {
         return contactService.updateContact(contactId, contact)
     }
 
