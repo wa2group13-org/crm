@@ -3,6 +3,7 @@ package it.polito.wa2.g13.crm.services
 import it.polito.wa2.g13.crm.IntegrationTest
 import it.polito.wa2.g13.crm.dtos.CreateAddressDTO
 import it.polito.wa2.g13.crm.dtos.CreateContactDTO
+import it.polito.wa2.g13.crm.exceptions.ContactException
 import it.polito.wa2.g13.crm.utils.randomAddresses
 import it.polito.wa2.g13.crm.utils.randomContacts
 import it.polito.wa2.g13.crm.utils.randomEmails
@@ -11,6 +12,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotEquals
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -141,7 +143,7 @@ class ContactServiceImplTest : IntegrationTest() {
 
     @Test
     fun `get a contact by id`() {
-        val contactIds = contacts.map { contactService.createContact(it) }
+        val contactIds = contacts.map { contactService.createContact(it).id }
 
         contactIds.forEachIndexed { index, id ->
             val contact = contactService.getContactById(id)
@@ -151,27 +153,28 @@ class ContactServiceImplTest : IntegrationTest() {
     }
 
     @Test
-    fun `should update an existing contact by creating a new one`() {
-        val contactId = contactService.createContact(contacts[0])
+    fun `updating a contact should keep the same id`() {
+        val contactDTO = contactService.createContact(contacts[0])
 
-        val updatedId = contactService.updateContact(contactId, contacts[1])
+        val updatedContactDTO = contactService.updateContact(contactDTO.id, contacts[1])
 
-        assertNotEquals(contactId, updatedId)
+        assertEquals(contactDTO.id, updatedContactDTO.id)
     }
 
     @Test
     fun `when removed a contact should not be retrieved`() {
-        val addedId = contactService.createContact(contacts[0])
-        contactService.deleteContactById(addedId)
-        // should not throw an Exception
+        val addedContactDTO = contactService.createContact(contacts[0])
+        contactService.deleteContactById(addedContactDTO.id)
+
+        assertThrows<ContactException.NotFound>{ contactService.getContactById(addedContactDTO.id)}
     }
 
     @Test
     fun `should retrieve an email by emailId`() {
-        val contactId = contactService.createContact(contacts[0])
-        val emails = contactService.getContactEmails(contactId)
+        val contactDTO = contactService.createContact(contacts[0])
+        val emails = contactService.getContactEmails(contactDTO.id)
 
-        val result = contactService.getContactEmailById(contactId, emails[1].id)
+        val result = contactService.getContactEmailById(contactDTO.id, emails[1].id)
 
         assertEquals(emails[1].email, result.email)
     }
@@ -180,7 +183,7 @@ class ContactServiceImplTest : IntegrationTest() {
     fun `get contact emails should return the emails list of a emails`() {
         val contacts = randomContacts(2, 3)
         val ids = mutableListOf<Long>()
-        contacts.forEach { ids.add(contactService.createContact(it)) }
+        contacts.forEach { ids.add(contactService.createContact(it).id) }
 
         val result = contactService.getContactEmails(ids[1])
 
@@ -196,7 +199,7 @@ class ContactServiceImplTest : IntegrationTest() {
             contacts[0].copy(emails = email1),
             contacts[1].copy(emails = email1 + email2)
         )
-            .map { contactService.createContact(it) }
+            .map { contactService.createContact(it).id }
 
         val emailIds = ids
             .map { contactService.getContactEmails(it) }
@@ -216,7 +219,7 @@ class ContactServiceImplTest : IntegrationTest() {
             contacts[0].copy(emails = email1),
             contacts[1].copy(emails = email1 + email2),
         )
-            .map { contactService.createContact(it) }
+            .map { contactService.createContact(it).id }
 
         val emailIds = ids
             .map { contactService.getContactEmails(it) }
@@ -229,9 +232,9 @@ class ContactServiceImplTest : IntegrationTest() {
 
     @Test
     fun `updating an email that does not exist should create a new one`() {
-        val contactId = contactService.createContact(contacts[0].copy(emails = listOf()))
+        val contactDTO = contactService.createContact(contacts[0].copy(emails = listOf()))
 
-        val updateId = contactService.updateContactEmail(contactId, 1, randomEmails(1).first())
+        val updateId = contactService.updateContactEmail(contactDTO.id, 1, randomEmails(1).first())
 
         assertNotEquals(null, updateId)
     }
@@ -241,10 +244,10 @@ class ContactServiceImplTest : IntegrationTest() {
         val email1 = randomEmails(1)
         val email2 = randomEmails(1)
 
-        val contactId = contactService.createContact(contacts[0].copy(emails = email1))
-        val emailId = contactService.getContactEmails(contactId).first().id
+        val contactDTO = contactService.createContact(contacts[0].copy(emails = email1))
+        val emailId = contactService.getContactEmails(contactDTO.id).first().id
 
-        val updatedId = contactService.updateContactEmail(contactId, emailId, email2[0])
+        val updatedId = contactService.updateContactEmail(contactDTO.id, emailId, email2[0])
 
         assertNotEquals(null, updatedId)
         assertNotEquals(emailId, updatedId)
@@ -253,10 +256,10 @@ class ContactServiceImplTest : IntegrationTest() {
     @Test
     fun `updating an email to the same value should return null`() {
         val email = randomEmails(1)
-        val contactId = contactService.createContact(contacts[0].copy(emails = email))
-        val emailId = contactService.getContactEmails(contactId).first().id
+        val contactDTO = contactService.createContact(contacts[0].copy(emails = email))
+        val emailId = contactService.getContactEmails(contactDTO.id).first().id
 
-        val updatedId = contactService.updateContactEmail(contactId, emailId, email[0])
+        val updatedId = contactService.updateContactEmail(contactDTO.id, emailId, email[0])
 
         assertEquals(null, updatedId)
     }
@@ -266,14 +269,14 @@ class ContactServiceImplTest : IntegrationTest() {
 
         val emails = randomEmails(3)
         val contacts = randomContacts(1, null)
-        val contactId = contactService.createContact(contacts[0])
+        val contactDTO = contactService.createContact(contacts[0])
 
         val emailIds = mutableListOf<Long>()
-        emails.forEach { emailIds.add(contactService.createContactEmail(contactId, it)) }
+        emails.forEach { emailIds.add(contactService.createContactEmail(contactDTO.id, it)) }
 
-        contactService.deleteContactEmailById(contactId, emailIds[0])
+        contactService.deleteContactEmailById(contactDTO.id, emailIds[0])
 
-        val result = contactService.getContactEmails(contactId)
+        val result = contactService.getContactEmails(contactDTO.id)
 
         assertEquals(result.size, 2)
         assertEquals(result[0].email, emails[1].email)
@@ -282,19 +285,19 @@ class ContactServiceImplTest : IntegrationTest() {
 
     @Test
     fun `should retrieve all telephone numbers of a given contactId`() {
-        val contactId = contactService.createContact(contacts[0])
+        val contactDTO = contactService.createContact(contacts[0])
 
-        val result = contactService.getContactTelephones(contactId)
+        val result = contactService.getContactTelephones(contactDTO.id)
 
         assertEquals(6, result.size)
     }
 
     @Test
     fun `should retrieve a telephone by telephoneId`() {
-        val contactId = contactService.createContact(contacts[0])
-        val telephones = contactService.getContactTelephones(contactId)
+        val contactDTO = contactService.createContact(contacts[0])
+        val telephones = contactService.getContactTelephones(contactDTO.id)
 
-        val result = contactService.getContactTelephoneById(contactId, telephones[1].id)
+        val result = contactService.getContactTelephoneById(contactDTO.id, telephones[1].id)
 
         assertEquals(telephones[1].number, result.number)
     }
@@ -302,12 +305,12 @@ class ContactServiceImplTest : IntegrationTest() {
     @Test
     fun `should create a new telephone and assign it to an existent contact`() {
         val telephones = randomTelephones(1)
-        val contactId = contactService.createContact(contacts[0])
+        val contactDTO = contactService.createContact(contacts[0])
 
-        val telephoneId = contactService.createContactTelephone(contactId, telephones[0])
+        val telephoneId = contactService.createContactTelephone(contactDTO.id, telephones[0])
 
 
-        val result = contactService.getContactTelephones(contactId)
+        val result = contactService.getContactTelephones(contactDTO.id)
 
         assertEquals(7, result.size)
         assertThat(result.map { it.id }.toSet()).contains(telephoneId)
@@ -316,9 +319,9 @@ class ContactServiceImplTest : IntegrationTest() {
 
     @Test
     fun `updating a telephone that does not exist should create a new one`() {
-        val contactId = contactService.createContact(contacts[0].copy(telephones = listOf()))
+        val contactDTO = contactService.createContact(contacts[0].copy(telephones = listOf()))
 
-        val updateId = contactService.updateContactTelephone(contactId, 1, randomTelephones(1).first())
+        val updateId = contactService.updateContactTelephone(contactDTO.id, 1, randomTelephones(1).first())
 
         assertNotEquals(null, updateId)
     }
@@ -328,10 +331,10 @@ class ContactServiceImplTest : IntegrationTest() {
         val telephone1 = randomTelephones(1)
         val telephone2 = randomTelephones(1)
 
-        val contactId = contactService.createContact(contacts[0].copy(telephones = telephone1))
-        val telephoneId = contactService.getContactTelephones(contactId).first().id
+        val contactDTO = contactService.createContact(contacts[0].copy(telephones = telephone1))
+        val telephoneId = contactService.getContactTelephones(contactDTO.id).first().id
 
-        val updatedId = contactService.updateContactTelephone(contactId, telephoneId, telephone2[0])
+        val updatedId = contactService.updateContactTelephone(contactDTO.id, telephoneId, telephone2[0])
 
         assertNotEquals(null, updatedId)
         assertNotEquals(telephoneId, updatedId)
@@ -340,10 +343,10 @@ class ContactServiceImplTest : IntegrationTest() {
     @Test
     fun `updating a telephone to the same value should return null`() {
         val telephone = randomTelephones(1)
-        val contactId = contactService.createContact(contacts[0].copy(telephones = telephone))
-        val telephoneId = contactService.getContactTelephones(contactId).first().id
+        val contactDTO = contactService.createContact(contacts[0].copy(telephones = telephone))
+        val telephoneId = contactService.getContactTelephones(contactDTO.id).first().id
 
-        val updatedId = contactService.updateContactTelephone(contactId, telephoneId, telephone[0])
+        val updatedId = contactService.updateContactTelephone(contactDTO.id, telephoneId, telephone[0])
 
         assertEquals(null, updatedId)
     }
@@ -352,14 +355,14 @@ class ContactServiceImplTest : IntegrationTest() {
     fun `should delete a telephone given contactId and telephoneId`() {
         val telephones = randomTelephones(3)
         val contacts = randomContacts(1, null)
-        val contactId = contactService.createContact(contacts[0])
+        val contactDTO = contactService.createContact(contacts[0])
 
         val telephonesIds = mutableListOf<Long>()
-        telephones.forEach { telephonesIds.add(contactService.createContactTelephone(contactId, it)) }
+        telephones.forEach { telephonesIds.add(contactService.createContactTelephone(contactDTO.id, it)) }
 
-        contactService.deleteContactTelephoneById(contactId, telephonesIds[0])
+        contactService.deleteContactTelephoneById(contactDTO.id, telephonesIds[0])
 
-        val result = contactService.getContactTelephones(contactId)
+        val result = contactService.getContactTelephones(contactDTO.id)
 
         assertEquals(2, result.size)
         assertEquals(telephones[1].number, result[0].number)
@@ -368,19 +371,19 @@ class ContactServiceImplTest : IntegrationTest() {
 
     @Test
     fun `should retrieve all the addresses of a given contactId`() {
-        val contactId = contactService.createContact(contacts[0])
+        val contactDTO = contactService.createContact(contacts[0])
 
-        val result = contactService.getContactAddresses(contactId)
+        val result = contactService.getContactAddresses(contactDTO.id)
 
         assertEquals(6, result.size)
     }
 
     @Test
     fun `should retrieve an address by addressId`() {
-        val contactId = contactService.createContact(contacts[0])
-        val addresses = contactService.getContactAddresses(contactId)
+        val contactDTO = contactService.createContact(contacts[0])
+        val addresses = contactService.getContactAddresses(contactDTO.id)
 
-        val result = contactService.getContactAddressById(contactId, addresses[1].id)
+        val result = contactService.getContactAddressById(contactDTO.id, addresses[1].id)
 
         assertThat(result).usingRecursiveComparison().ignoringFields("id").isEqualTo(addresses[1])
     }
@@ -388,11 +391,11 @@ class ContactServiceImplTest : IntegrationTest() {
     @Test
     fun `should create a new address and assign it to an existent contact`() {
         val addresses = randomAddresses(1)
-        val contactId = contactService.createContact(contacts[0])
+        val contactDTO = contactService.createContact(contacts[0])
 
-        val addressId = contactService.createContactAddress(contactId, addresses[0])
+        val addressId = contactService.createContactAddress(contactDTO.id, addresses[0])
 
-        val result = contactService.getContactAddresses(contactId)
+        val result = contactService.getContactAddresses(contactDTO.id)
 
         assertEquals(7, result.size)
         assertThat(result.map { it.id }.toSet()).contains(addressId)
@@ -401,9 +404,9 @@ class ContactServiceImplTest : IntegrationTest() {
 
     @Test
     fun `updating a address that does not exist should create a new one`() {
-        val contactId = contactService.createContact(contacts[0].copy(addresses = listOf()))
+        val contactDTO = contactService.createContact(contacts[0].copy(addresses = listOf()))
 
-        val updateId = contactService.updateContactAddress(contactId, 1, randomAddresses(1).first())
+        val updateId = contactService.updateContactAddress(contactDTO.id, 1, randomAddresses(1).first())
 
         assertNotEquals(null, updateId)
     }
@@ -413,10 +416,10 @@ class ContactServiceImplTest : IntegrationTest() {
         val address1 = randomAddresses(1)
         val address2 = randomAddresses(1)
 
-        val contactId = contactService.createContact(contacts[0].copy(addresses = address1))
-        val addressId = contactService.getContactAddresses(contactId).first().id
+        val contactDTO = contactService.createContact(contacts[0].copy(addresses = address1))
+        val addressId = contactService.getContactAddresses(contactDTO.id).first().id
 
-        val updatedId = contactService.updateContactAddress(contactId, addressId, address2[0])
+        val updatedId = contactService.updateContactAddress(contactDTO.id, addressId, address2[0])
 
         assertNotEquals(null, updatedId)
         assertNotEquals(addressId, updatedId)
@@ -425,10 +428,10 @@ class ContactServiceImplTest : IntegrationTest() {
     @Test
     fun `updating an address to the same value should return null`() {
         val address = randomAddresses(1)
-        val contactId = contactService.createContact(contacts[0].copy(addresses = address))
-        val addressId = contactService.getContactAddresses(contactId).first().id
+        val contactDTO = contactService.createContact(contacts[0].copy(addresses = address))
+        val addressId = contactService.getContactAddresses(contactDTO.id).first().id
 
-        val updatedId = contactService.updateContactAddress(contactId, addressId, address[0])
+        val updatedId = contactService.updateContactAddress(contactDTO.id, addressId, address[0])
 
         assertEquals(null, updatedId)
     }
@@ -437,14 +440,14 @@ class ContactServiceImplTest : IntegrationTest() {
     fun `should delete an address given contactId and addressId`() {
         val addresses = randomAddresses(3)
         val contacts = randomContacts(1, null)
-        val contactId = contactService.createContact(contacts[0])
+        val contactDTO = contactService.createContact(contacts[0])
 
         val addressIds = mutableListOf<Long>()
-        addresses.forEach { addressIds.add(contactService.createContactAddress(contactId, it)) }
+        addresses.forEach { addressIds.add(contactService.createContactAddress(contactDTO.id, it)) }
 
-        contactService.deleteContactAddressById(contactId, addressIds[0])
+        contactService.deleteContactAddressById(contactDTO.id, addressIds[0])
 
-        val result = contactService.getContactAddresses(contactId)
+        val result = contactService.getContactAddresses(contactDTO.id)
 
         assertEquals(2, result.size)
 

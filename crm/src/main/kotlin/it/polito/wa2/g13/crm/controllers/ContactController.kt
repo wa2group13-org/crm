@@ -51,15 +51,8 @@ class ContactController(
         request: HttpServletRequest,
         @PathVariable("contactId") contactId: Long,
         @Valid @RequestBody contact: CreateContactDTO
-    ): ResponseEntity<Unit> {
-        val contactDTO = contactService.updateContact(contactId, contact)
-
-        return if (newId != null) {
-            val contactURI = URI.create("${request.requestURIDropLast(1)}/$newId")
-            ResponseEntity.created(contactURI).build()
-        } else {
-            ResponseEntity.noContent().build()
-        }
+    ): ContactDTO{
+        return contactService.updateContact(contactId, contact)
     }
 
 
