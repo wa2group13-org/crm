@@ -31,7 +31,7 @@ class JobOfferController(
         )
     }
 
-    @PostMapping("")
+    @PostMapping("", "/")
     fun createJobOffer(@RequestBody createJobOfferDTO: CreateJobOfferDTO): JobOfferDTO {
         return jobOfferService.createJobOffer(createJobOfferDTO)
     }
@@ -64,18 +64,18 @@ class JobOfferController(
     }
 
     @GetMapping("/{jobOfferId}/notes/{noteId}")
-    fun getNoteById(@PathVariable jobOfferId: Long, @PathVariable noteId: Long): JobOfferHistoryDTO {
+    fun getNoteById(@PathVariable @Valid @Min(0) jobOfferId: Long, @PathVariable @Valid @Min(0) noteId: Long): JobOfferHistoryDTO {
         return jobOfferService.getNoteById(jobOfferId, noteId)
     }
 
     @GetMapping("/{jobOfferId}/notes")
-    fun getNotesByJobOfferId(@PathVariable jobOfferId: Long): List<JobOfferHistoryDTO> {
+    fun getNotesByJobOfferId(@PathVariable @Valid @Min(0) jobOfferId: Long): List<JobOfferHistoryDTO> {
         return jobOfferService.getNotesByJobOfferId(jobOfferId)
     }
 
     @PostMapping("/{jobOfferId}/notes")
     fun addNoteByJobOfferId(
-        @PathVariable jobOfferId: Long,
+        @PathVariable @Valid @Min(0) jobOfferId: Long,
         @RequestBody createJobOfferHistoryNoteDTO: CreateJobOfferHistoryNoteDTO
     ): JobOfferHistoryDTO {
         return jobOfferService.addNoteByJobOfferId(jobOfferId, createJobOfferHistoryNoteDTO)
@@ -83,8 +83,8 @@ class JobOfferController(
 
     @PutMapping("/{jobOfferId}/notes/{noteId}")
     fun updateNoteById(
-        @PathVariable jobOfferId: Long,
-        @PathVariable noteId: Long,
+        @PathVariable @Valid @Min(0) jobOfferId: Long,
+        @PathVariable @Valid @Min(0) noteId: Long,
         @RequestBody note: CreateJobOfferHistoryNoteDTO
     ): JobOfferHistoryDTO {
         return jobOfferService.updateNoteById(jobOfferId, noteId, note)

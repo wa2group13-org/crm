@@ -345,3 +345,6 @@ Content-Type: application/json
     "Cloud"
   ]
 }
+
+### get a joboffer by id (expected 200)
+GET http://localhost:8080/API/joboffers
