@@ -27,6 +27,7 @@ class JobOffer(
     var customer: Customer,
     @OneToOne(fetch = FetchType.LAZY)
     var professional: Professional?,
+    @Column(columnDefinition = "text")
     var description: String? = null,
     @Enumerated(EnumType.STRING)
     var status: JobOfferStatus,
