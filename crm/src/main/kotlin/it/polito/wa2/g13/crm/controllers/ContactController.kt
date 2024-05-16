@@ -162,6 +162,7 @@ class ContactController(
     }
 
     @DeleteMapping("/{contactId}/telephones/{telephoneId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     @Throws(ContactException::class)
     fun deleteContactTelephoneById(
         @PathVariable("contactId") contactId: Long,

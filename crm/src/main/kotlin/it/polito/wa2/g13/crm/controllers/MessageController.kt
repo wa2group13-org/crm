@@ -65,6 +65,7 @@ class MessageController(
     }
 
     @PutMapping("/{messageId}/priority")
+    @ResponseStatus(HttpStatus.OK)
     fun changeMessagePriority(
         @PathVariable @Valid @Min(0, message = "messageId must be positive") messageId: Long,
         @RequestBody @Valid changeMessagePriorityDTO: ChangeMessagePriorityDTO

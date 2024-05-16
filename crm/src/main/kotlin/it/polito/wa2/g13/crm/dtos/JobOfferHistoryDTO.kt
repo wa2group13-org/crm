@@ -28,23 +28,6 @@ data class JobOfferHistoryDTO(
     }
 }
 
-data class CreateJobOfferHistoryDTO(
-    val assignedProfessional: Long?,
-    val currentStatus: JobOfferStatus,
-    val note: String?,
-) {
-    companion object {
-        @JvmStatic
-        fun from(jobOfferHistoryDTO: JobOfferHistoryDTO): CreateJobOfferHistoryDTO {
-            return CreateJobOfferHistoryDTO(
-                jobOfferHistoryDTO.assignedProfessional,
-                jobOfferHistoryDTO.currentStatus,
-                jobOfferHistoryDTO.note
-            )
-        }
-    }
-}
-
 data class CreateJobOfferHistoryNoteDTO(
     @field:NotBlank(message = "Note is required")
     @field:Size(max = 5000, message = "Note must at most 5000 characters")

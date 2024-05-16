@@ -9,8 +9,7 @@ import it.polito.wa2.g13.crm.dtos.*
 import it.polito.wa2.g13.crm.services.*
 import it.polito.wa2.g13.crm.utils.*
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.slf4j.LoggerFactory
@@ -187,7 +186,10 @@ class JobOfferControllerTest : IntegrationTest() {
         val res = restClient.exchange<Double>(req)
 
         assertTrue(res.statusCode.is2xxSuccessful)
-        assertEquals(res.body, professional.dailyRate * jobOffers[0].duration * PROFIT_MARGIN)
+        assertNotNull(res.body)
+        res.body?.let {
+            assertEquals(it, professional.dailyRate * jobOffers[0].duration * PROFIT_MARGIN, 0.001)
+        }
     }
 
     @Test

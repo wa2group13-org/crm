@@ -10,6 +10,7 @@ import it.polito.wa2.g13.crm.services.ProfessionalService
 import jakarta.validation.Valid
 import jakarta.validation.constraints.*
 import org.springframework.data.domain.Page
+import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
@@ -60,6 +61,7 @@ class ProfessionalController(
     }
 
     @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     @Throws(ProfessionalException::class)
     fun deleteProfessional(@PathVariable("id") id: Long) {
         professionalService.deleteProfessional(id)
@@ -75,6 +77,7 @@ class ProfessionalController(
     }
 
     @PutMapping("/{id}/employmentState")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     @Throws(ProfessionalException::class)
     fun updateProfessionalEmploymentState(
         @PathVariable("id") id: Long,
@@ -84,6 +87,7 @@ class ProfessionalController(
     }
 
     @PutMapping("/{id}/dailyRate")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     fun updateProfessionalDailyRate(
         @PathVariable("id") id: Long,
         @RequestBody @DecimalMin("0.0") dailyRate: Double,
@@ -92,6 +96,7 @@ class ProfessionalController(
     }
 
     @PutMapping("/{id}/skills")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     fun updateProfessionalSkills(
         @PathVariable("id") id: Long,
         @RequestBody @Valid skills: Set<CreateSkillDTO>,
@@ -100,6 +105,7 @@ class ProfessionalController(
     }
 
     @PutMapping("/{id}/contact")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     fun updateProfessionalContact(
         @PathVariable("id") id: Long,
         @RequestBody contactId: Long,

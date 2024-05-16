@@ -100,6 +100,7 @@ fun randomProfessional(contactId: Long, randomRelations: Int?): CreateProfession
     contactId = contactId,
 )
 
+@Suppress("unused")
 fun randomProfessionals(contactIds: List<Long>, randomRelations: Int?): List<CreateProfessionalDTO> = contactIds
     .map { randomProfessional(it, randomRelations) }
     .toList()
@@ -110,16 +111,10 @@ fun randomCustomer(contact: ContactDTO/*, randomRelations: Int?*/): CreateCustom
     note = UUID.randomUUID().toString(),
 )
 
+@Suppress("unused")
 fun randomCustomers(contacts: List<ContactDTO>/*, randomRelations: Int?*/): List<CreateCustomerDTO> = contacts
     .map { randomCustomer(it/*, randomRelations*/) }
     .toList()
-
-//fun randomJobOfferHistory(assignedProfessional: Long?, currentStatus: JobOfferStatus): CreateJobOfferHistoryDTO =
-//    CreateJobOfferHistoryDTO(
-//        assignedProfessional = assignedProfessional,
-//        currentStatus = currentStatus,
-//        note = UUID.randomUUID().toString(),
-//    )
 
 fun randomSkills(n: Int): List<CreateSkillDTO> {
     return n.let {

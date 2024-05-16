@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*
 class CustomerController(private val customerService: CustomerService) {
 
     @GetMapping("", "/")
+    @ResponseStatus(HttpStatus.OK)
     fun getCustomers(
         @RequestParam("page") page: Int,
         @RequestParam("limit") limit: Int,
@@ -23,6 +24,7 @@ class CustomerController(private val customerService: CustomerService) {
     }
 
     @GetMapping("/{customerId}")
+    @ResponseStatus(HttpStatus.OK)
     fun getCustomerById(@PathVariable("customerId") customerId: Long): CustomerDTO {
         return customerService.getCustomerById(customerId)
     }
@@ -40,11 +42,13 @@ class CustomerController(private val customerService: CustomerService) {
     }
 
     @PutMapping("/{customerId}/note")
+    @ResponseStatus(HttpStatus.OK)
     fun updateCustomerNote(@PathVariable customerId: Long, @RequestBody customerNoteDTO: CustomerNoteDTO) {
         customerService.updateCustomerNote(customerId, customerNoteDTO.note)
     }
 
     @PutMapping("/{customerId}/contact")
+    @ResponseStatus(HttpStatus.OK)
     fun updateCustomerContact(@PathVariable customerId: Long, @RequestBody contactIdDTO: ContactIdDTO) {
         customerService.updateCustomerContact(customerId, contactIdDTO.contactId)
     }
