@@ -50,7 +50,7 @@ class JobOfferControllerTest : IntegrationTest() {
 
     fun initJobOffers(n: Int) {
         val contacts = randomCategorizedContacts(n, n, ContactCategory.Unknown)
-        contactsIds.addAll(contacts.map { contactService.createContact(it) }.toList())
+        contactsIds.addAll(contacts.map { contactService.createContact(it).id }.toList())
 
         customersIds.addAll(
             contactsIds.map {
@@ -142,7 +142,7 @@ class JobOfferControllerTest : IntegrationTest() {
 
     @Test
     fun `createJobOffer should successfully create a job offer`() {
-        val contactId = contactService.createContact(randomCategorizedContact(category = ContactCategory.Unknown))
+        val contactId = contactService.createContact(randomCategorizedContact(category = ContactCategory.Unknown)).id
         val customer = customerService.createCustomer(contactId)
 
         val jobOffer = randomJobOffer(customer.id, 3, JobOfferStatus.Created)
@@ -169,11 +169,11 @@ class JobOfferControllerTest : IntegrationTest() {
     fun `getJobOfferValue should retrieve the value`() {
         initJobOffers(1)
         val id = jobOffers[0].id
-        val contactId = contactService.createContact(randomCategorizedContact(category = ContactCategory.Unknown))
+        val contactId = contactService.createContact(randomCategorizedContact(category = ContactCategory.Unknown)).id
         val professional = professionalService.getProfessional(
             professionalService.createProfessional(
                 randomProfessional(contactId, 1).copy(employmentState = EmploymentState.Available, dailyRate = 12.5)
-            )
+            ).id
         )
         jobOfferService.updateJobOfferStatus(id, UpdateJobOfferStatusDTO(JobOfferStatus.SelectionPhase, null, null))
         jobOfferService.updateJobOfferStatus(id, UpdateJobOfferStatusDTO(JobOfferStatus.CandidateProposal, null, null))
@@ -262,11 +262,11 @@ class JobOfferControllerTest : IntegrationTest() {
     @Test
     fun `getNotes by id should return all the notes of the giver joboffer`() {
         initJobOffers(1)
-        val contactId = contactService.createContact(randomCategorizedContact(category = ContactCategory.Unknown))
+        val contactId = contactService.createContact(randomCategorizedContact(category = ContactCategory.Unknown)).id
         val professional = professionalService.getProfessional(
             professionalService.createProfessional(
                 randomProfessional(contactId, 1).copy(employmentState = EmploymentState.Available, dailyRate = 12.5)
-            )
+            ).id
         )
         jobOfferService.updateJobOfferStatus(
             jobOffers[0].id,
