@@ -39,12 +39,12 @@ class ProfessionalServiceImplTest : IntegrationTest() {
             @Autowired professionalService: ProfessionalService,
         ) {
             contacts.forEach { contact ->
-                val contactId = contactService.createContact(contact)
+                val contactDTO = contactService.createContact(contact)
 
-                val professional = randomProfessional(contactId, 5)
+                val professional = randomProfessional(contactDTO.id, 5)
                 _professionals.add(professional)
 
-                val professionalId = professionalService.createProfessional(professional)
+                val professionalId = professionalService.createProfessional(professional).id
                 _professionalsId.add(professionalId)
             }
 
@@ -60,15 +60,15 @@ class ProfessionalServiceImplTest : IntegrationTest() {
 
     private fun newProfessional(): Pair<CreateProfessionalDTO, CreateContactDTO> {
         val contact = randomContacts(1, 5)[0].copy(category = ContactCategory.Unknown)
-        val contactId = contactService.createContact(contact)
-        return Pair(randomProfessional(contactId, 5), contact)
+        val contactDTO = contactService.createContact(contact)
+        return Pair(randomProfessional(contactDTO.id, 5), contact)
     }
 
     @Test
     fun `creating a new professional should modify also the contact`() {
         val (professional, _) = newProfessional()
 
-        val professionalId = professionalService.createProfessional(professional)
+        val professionalId = professionalService.createProfessional(professional).id
 
         val p = professionalService.getProfessional(professionalId)
         val c = contactService.getContactById(p.contact.id)

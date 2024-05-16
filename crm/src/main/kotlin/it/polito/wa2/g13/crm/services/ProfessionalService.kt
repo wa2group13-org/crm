@@ -11,12 +11,12 @@ import org.springframework.data.domain.Page
 interface ProfessionalService {
     fun getProfessionals(page: Int, limit: Int, professionalFilters: ProfessionalFilters): Page<ProfessionalDTO>
 
-    fun createProfessional(professionalDto: CreateProfessionalDTO): Long
+    fun createProfessional(professionalDto: CreateProfessionalDTO): ProfessionalDTO
 
     @Throws(ProfessionalException.NotFound::class)
     fun getProfessional(id: Long): ProfessionalDTO
 
-    fun updateProfessional(id: Long, professionalDto: CreateProfessionalDTO): Long?
+    fun updateProfessional(id: Long, professionalDto: CreateProfessionalDTO): ProfessionalDTO?
 
     @Throws(ProfessionalException.NotFound::class)
     fun deleteProfessional(id: Long)

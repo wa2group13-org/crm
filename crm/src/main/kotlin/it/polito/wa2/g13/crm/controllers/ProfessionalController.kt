@@ -33,10 +33,10 @@ class ProfessionalController(
     @PostMapping("")
     fun createProfessional(
         @RequestBody professional: CreateProfessionalDTO
-    ): ResponseEntity<Unit> {
-        val newId = professionalService.createProfessional(professional)
+    ): ResponseEntity<ProfessionalDTO> {
+        val newProfessional = professionalService.createProfessional(professional)
 
-        return ResponseEntity.created(URI.create("/API/professionals/$newId")).build()
+        return ResponseEntity.created(URI.create("/API/professionals/${newProfessional.id}")).body(newProfessional)
     }
 
     @GetMapping("/{id}")
@@ -49,11 +49,11 @@ class ProfessionalController(
     fun updateProfessional(
         @PathVariable("id") id: Long,
         @RequestBody @Valid professional: CreateProfessionalDTO
-    ): ResponseEntity<Unit> {
-        val newId = professionalService.updateProfessional(id, professional)
+    ): ResponseEntity<ProfessionalDTO> {
+        val newProfessional = professionalService.updateProfessional(id, professional)
 
-        return if (newId != null) {
-            ResponseEntity.created(URI.create("/API/professionals/$newId")).build()
+        return if (newProfessional != null) {
+            ResponseEntity.created(URI.create("/API/professionals/${newProfessional.id}")).body(newProfessional)
         } else {
             ResponseEntity.noContent().build()
         }

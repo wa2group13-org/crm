@@ -45,13 +45,13 @@ class ProfessionalControllerTest : IntegrationTest() {
         professionals.clear()
 
         contacts.forEach { contact ->
-            val contactId = contactService.createContact(contact)
+            val contactDTO = contactService.createContact(contact)
 
-            val professional = randomProfessional(contactId, 5)
+            val professional = randomProfessional(contactDTO.id, 5)
             professionals.add(professional)
 
-            val id = professionalService.createProfessional(professional)
-            professionalIds.add(id)
+            val newProfessional = professionalService.createProfessional(professional)
+            professionalIds.add(newProfessional.id)
         }
 
         logger.info("Initialized DB")
@@ -59,8 +59,8 @@ class ProfessionalControllerTest : IntegrationTest() {
 
     fun newProfessional(): Pair<CreateProfessionalDTO, CreateContactDTO> {
         val contact = randomContacts(1, 5)[0].copy(category = ContactCategory.Unknown)
-        val contactId = contactService.createContact(contact)
-        return Pair(randomProfessional(contactId, 5), contact)
+        val contactDTO = contactService.createContact(contact)
+        return Pair(randomProfessional(contactDTO.id, 5), contact)
     }
 
 
@@ -106,7 +106,7 @@ class ProfessionalControllerTest : IntegrationTest() {
         val (professional, _) = newProfessional()
 
         val professionalId = restClient
-            .exchange<Unit>(
+            .exchange<ProfessionalDTO>(
                 RequestEntity.post("/API/professionals").body(professional, CreateProfessionalDTO::class.java)
             )
             .headers
@@ -160,7 +160,7 @@ class ProfessionalControllerTest : IntegrationTest() {
     fun `updating a professional that doesn't exist should create a new one`() {
         val (newProfessional, _) = newProfessional()
         val newId = restClient
-            .exchange<Unit>(
+            .exchange<ProfessionalDTO>(
                 RequestEntity.put("/API/professionals/-1").body(newProfessional, CreateProfessionalDTO::class.java)
             )
             .headers
