@@ -29,22 +29,6 @@ repositories {
     mavenCentral()
 }
 
-tasks {
-    bootRun {
-        environment["SPRING_PROFILES_ACTIVE"] = "dev"
-    }
-}
-
-tasks.named<BootBuildImage>("bootBuildImage") {
-    imageName = "${System.getenv("DOCKER_USERNAME")}/${project.name}:${project.version}"
-    docker {
-        publishRegistry {
-            username = System.getenv("DOCKER_USERNAME")
-            password = System.getenv("DOCKER_PASSWORD")
-        }
-    }
-}
-
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-web")
@@ -72,3 +56,28 @@ tasks.withType<KotlinCompile> {
 tasks.withType<Test> {
     useJUnitPlatform()
 }
+
+tasks {
+    bootRun {
+        environment["SPRING_PROFILES_ACTIVE"] = "dev"
+    }
+}
+
+tasks.named<BootBuildImage>("bootBuildImage") {
+    imageName = "${System.getenv("DOCKER_USERNAME")}/${project.name}:${project.version}"
+    docker {
+        publishRegistry {
+            username = System.getenv("DOCKER_USERNAME")
+            password = System.getenv("DOCKER_PASSWORD")
+        }
+    }
+}
+
+abstract class ProjectVersion : DefaultTask() {
+    @TaskAction
+    fun action() {
+        print(project.version)
+    }
+}
+
+tasks.register<ProjectVersion>("projectVersion")
