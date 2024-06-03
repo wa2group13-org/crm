@@ -37,6 +37,6 @@ jobs:
     - name: Build with Gradle Wrapper
       working-directory: ./crm
       run: |
-        export SPRING_PROFILES_ACTIVE=dev
+        export SPRING_PROFILES_ACTIVE=dev,no-security
         ./gradlew build --info
 
