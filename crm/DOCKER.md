@@ -15,3 +15,4 @@
     - `prod`: need to specify postgres connections
     - `no-security`: filers are disables
 - `JWT_ISSUER_URI`: uri of the JWT issuer, e.g. `http://keycloak:9090/realms/app`
+- `KAFKA_CONSUMER_BOOTSTRAP_SERVERS`: consumer bootstrap servers for Apache Kafka

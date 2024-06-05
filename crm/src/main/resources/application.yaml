@@ -7,3 +7,12 @@ spring:
     active:
       - dev
       - no-security
+  kafka:
+    consumer:
+      group-id: crm-consumer
+      auto-offset-reset: earliest
+      key-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: it.polito.wa2.g13.communication_manager.dtos
+        spring.json.type.mapping: it.polito.wa2.g13.communication_manager.dtos.CreateMessageDTO:it.polito.wa2.g13.crm.dtos.CreateMessageDTO
