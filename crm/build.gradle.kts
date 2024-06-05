@@ -12,7 +12,7 @@ plugins {
 }
 
 group = "it.polito.wa2.g13"
-version = "0.0.2-SNAPSHOT"
+version = "1.0.0"
 
 java {
     sourceCompatibility = JavaVersion.VERSION_21
