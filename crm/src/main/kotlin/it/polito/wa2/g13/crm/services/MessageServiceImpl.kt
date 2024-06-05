@@ -68,14 +68,15 @@ class MessageServiceImpl(
         }
 
         val message = Message(
-            createMessageDTO.body,
-            createMessageDTO.sender,
-            OffsetDateTime.now(),
-            createMessageDTO.subject,
-            createMessageDTO.channel,
-            createMessageDTO.priority,
-            Status.Received,
-            mutableSetOf()
+            body = createMessageDTO.body,
+            sender = createMessageDTO.sender,
+            date = OffsetDateTime.now(),
+            subject = createMessageDTO.subject,
+            channel = createMessageDTO.channel,
+            priority = createMessageDTO.priority,
+            status = Status.Received,
+            history = mutableSetOf(),
+            mailId = createMessageDTO.mailId
         )
         val logAction = MessageActionsHistory(message, message.status, message.date, null)
         message.history.add(logAction)

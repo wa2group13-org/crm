@@ -83,7 +83,8 @@ fun randomMessage(priority: Priority?, channel: String?): CreateMessageDTO {
         channel ?: "channel",
         prior,
         "subject",
-        "body"
+        "body",
+        null
     )
 }
 

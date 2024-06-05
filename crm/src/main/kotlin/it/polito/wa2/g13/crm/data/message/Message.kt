@@ -38,6 +38,8 @@ class Message(
     var status: Status,
 
     @OneToMany(cascade = [CascadeType.ALL], fetch = FetchType.LAZY, mappedBy = "message")
-    var history: MutableSet<MessageActionsHistory>
+    var history: MutableSet<MessageActionsHistory>,
+
+    var mailId: String?,
 
 ) : BaseEntity()
