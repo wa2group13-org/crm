@@ -4,4 +4,6 @@ spring:
   jpa:
     open-in-view: false
   profiles:
-    active: dev
+    active:
+      - dev
+      - no-security

@@ -18,4 +18,4 @@ RES=$(jq -n --arg u "$DOCKER_USERNAME" --arg p "$DOCKER_PASSWORD" '{"username":$
 JWT=$(jq -r '.token' <<<"$RES")
 
 # Update container description
-jq -n --arg d "$(<DOCKER.md)" '{"full_description":$d}' | curl -X PATCH -d @- -H "Content-Type: application/json" -H "Authorization: JWT $JWT" https://hub.docker.com/v2/repositories/wa2group13/communication_manager
+jq -n --arg d "$(<DOCKER.md)" '{"full_description":$d}' | curl -X PATCH -d @- -H "Content-Type: application/json" -H "Authorization: JWT $JWT" https://hub.docker.com/v2/repositories/wa2group13/crm

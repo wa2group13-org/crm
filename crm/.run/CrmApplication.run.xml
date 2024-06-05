@@ -1,6 +1,6 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="CrmApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
-    <option name="ACTIVE_PROFILES" value="dev" />
+    <option name="ACTIVE_PROFILES" value="dev,no-security" />
     <module name="crm.main" />
     <option name="SPRING_BOOT_MAIN_CLASS" value="it.polito.wa2.g13.crm.CrmApplication" />
     <method v="2">
