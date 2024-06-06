@@ -16,3 +16,6 @@ spring:
       properties:
         spring.json.trusted.packages: it.polito.wa2.g13.communication_manager.dtos
         spring.json.type.mapping: it.polito.wa2.g13.communication_manager.dtos.CreateMessageDTO:it.polito.wa2.g13.crm.dtos.CreateMessageDTO
+
+kafka-config:
+  mail-topic: ${MAIL_TOPIC:mail.json}

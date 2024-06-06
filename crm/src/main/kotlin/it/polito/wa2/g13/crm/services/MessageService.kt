@@ -44,4 +44,7 @@ interface MessageService {
     fun getMessageHistory(
         messageId: Long,
     ): List<MessageActionsHistoryDTO>
+
+    @Throws(MessageException.NotFound::class)
+    fun getMessageByMailId(mailId: String): MessageDTO
 }

@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component
 class KafkaMessageConsumer(
     private val messageService: MessageService,
 ) {
-    @KafkaListener(id = "crm-messages", topics = ["topic-crm-messages"])
+    @KafkaListener(id = "crm-messages", topics = ["\${kafka-config.mail-topic}"])
     fun getMessage(@Payload @Valid message: CreateMessageDTO) {
         messageService.createMessage(message)
     }

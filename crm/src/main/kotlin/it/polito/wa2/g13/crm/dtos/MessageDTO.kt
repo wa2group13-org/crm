@@ -13,20 +13,22 @@ data class MessageDTO(
     val subject: String?,
     val channel: String,
     val priority: Priority,
-    val status: Status
+    val status: Status,
+    val mailId: String?,
 ) {
     companion object {
         @JvmStatic
         fun from(message: Message): MessageDTO {
             return MessageDTO(
-                message.id,
-                message.body,
-                message.sender,
-                message.date,
-                message.subject,
-                message.channel,
-                message.priority,
-                message.status
+                id = message.id,
+                body = message.body,
+                sender = message.sender,
+                date = message.date,
+                subject = message.subject,
+                channel = message.channel,
+                priority = message.priority,
+                status = message.status,
+                mailId = message.mailId,
             )
         }
     }
