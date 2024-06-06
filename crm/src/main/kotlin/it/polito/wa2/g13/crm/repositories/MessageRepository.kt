@@ -24,4 +24,6 @@ interface MessageRepository : JpaRepository<Message, Long> {
     fun findAllByStatus(page: Pageable, status: Status): Page<Message>
 
     fun countAllBySenderAndChannel(sender: String, channel: String): Int
+
+    fun findByMailId(mailId: String): Message?
 }

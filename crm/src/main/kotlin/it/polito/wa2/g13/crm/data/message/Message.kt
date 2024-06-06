@@ -21,6 +21,11 @@ enum class Status {
 }
 
 @Entity
+@Table(
+    indexes = [
+        Index(columnList = "mailId", unique = true),
+    ]
+)
 class Message(
     var body: String?,
     var sender: String,
@@ -40,6 +45,7 @@ class Message(
     @OneToMany(cascade = [CascadeType.ALL], fetch = FetchType.LAZY, mappedBy = "message")
     var history: MutableSet<MessageActionsHistory>,
 
+    @Column(unique = true, updatable = false)
     var mailId: String?,
 
 ) : BaseEntity()

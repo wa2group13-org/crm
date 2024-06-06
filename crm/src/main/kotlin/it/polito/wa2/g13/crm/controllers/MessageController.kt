@@ -72,5 +72,12 @@ class MessageController(
     ): MessageDTO {
         return messageService.changeMessagePriority(messageId, changeMessagePriorityDTO.priority)
     }
+
+    @GetMapping("/mailId/{mailId}")
+    fun getMessageByMailId(
+        @PathVariable mailId: String,
+    ): MessageDTO {
+        return messageService.getMessageByMailId(mailId)
+    }
 }
 

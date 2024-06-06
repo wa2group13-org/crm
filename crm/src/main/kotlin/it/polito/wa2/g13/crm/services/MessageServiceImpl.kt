@@ -131,4 +131,9 @@ class MessageServiceImpl(
 
         return message.history.map { MessageActionsHistoryDTO.from(it) }
     }
+
+    override fun getMessageByMailId(mailId: String): MessageDTO {
+        return messageRepository.findByMailId(mailId)?.let { MessageDTO.from(it) }
+            ?: throw MessageException.NotFound("Message with mailId $mailId was not found")
+    }
 }
