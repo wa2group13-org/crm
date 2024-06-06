@@ -84,7 +84,7 @@ fun randomMessage(priority: Priority?, channel: String?): CreateMessageDTO {
         prior,
         "subject",
         "body",
-        null
+        UUID.randomUUID().toString(),
     )
 }
 

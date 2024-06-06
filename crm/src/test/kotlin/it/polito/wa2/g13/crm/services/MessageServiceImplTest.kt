@@ -11,19 +11,18 @@ import it.polito.wa2.g13.crm.utils.randomMessages
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
-import org.slf4j.LoggerFactory
+import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.transaction.annotation.Transactional
 import java.time.OffsetDateTime
+import java.util.*
 import kotlin.math.min
 
 @SpringBootTest
 @Transactional
 class MessageServiceImplTest : IntegrationTest() {
     companion object {
-        private val logger = LoggerFactory.getLogger(MessageServiceImplTest::class.java)
-
         private val messages = randomMessages(15)
     }
 
@@ -198,5 +197,21 @@ class MessageServiceImplTest : IntegrationTest() {
             )
     }
 
+    @Test
+    fun `should get a message by mailId`() {
+        val message = messageService.createMessage(messages.first())
 
+        val res = messageService.getMessageByMailId(message.mailId!!)
+
+        assertEquals(message, res)
+    }
+
+    @Test
+    fun `should throw an error if the mailId does not exist`() {
+        messageService.createMessage(messages.first())
+
+        assertThrows<MessageException.NotFound> {
+            messageService.getMessageByMailId(UUID.randomUUID().toString())
+        }
+    }
 }
