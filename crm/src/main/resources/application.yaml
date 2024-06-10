@@ -26,3 +26,9 @@ springdoc:
     enabled: false
   swagger-ui:
     enabled: false
+
+server:
+  port: ${PORT:8080}
+
+openapi:
+  base-url: ${OPENAPI_BASE_URL:http://localhost:${server.port}}

@@ -45,13 +45,13 @@ dependencies {
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json")
+    // Needed by springdoc-openapi
     implementation("com.github.therapi:therapi-runtime-javadoc:0.15.0")
+    kapt("com.github.therapi:therapi-runtime-javadoc-scribe:0.15.0")
 
     developmentOnly("org.springframework.boot:spring-boot-docker-compose")
 
     runtimeOnly("org.postgresql:postgresql")
-
-    kapt("com.github.therapi:therapi-runtime-javadoc-scribe:0.15.0")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework.boot:spring-boot-testcontainers")
@@ -99,7 +99,6 @@ tasks.withType<ProcessResources> {
         val properties = Properties().apply {
             this.setProperty("project.version", project.version.toString())
         }
-        println(properties.toString())
 
         propertiesFile.writer().use { properties.store(it, null) }
     }

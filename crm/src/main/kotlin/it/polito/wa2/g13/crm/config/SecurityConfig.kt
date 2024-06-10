@@ -20,12 +20,12 @@ class SecurityConfig(
     fun filterChain(http: HttpSecurity): SecurityFilterChain {
         return http
             .authorizeHttpRequests {
-                it.anyRequest().authenticated()
-
                 // If api-docs is enabled allow resource access to get the api
                 if (environment.acceptsProfiles(Profiles.of("api-docs"))) {
                     it.requestMatchers("/v3/api-docs/**", "/swagger-ui.html", "/swagger-ui/**").permitAll()
                 }
+
+                it.anyRequest().authenticated()
             }
             .oauth2ResourceServer { it.jwt {} }
             .sessionManagement {
