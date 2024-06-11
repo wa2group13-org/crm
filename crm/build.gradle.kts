@@ -10,6 +10,7 @@ plugins {
     kotlin("plugin.jpa") version "1.9.23"
     kotlin("plugin.serialization") version "1.9.23"
 }
+val springCloudVersion by extra("2023.0.2")
 
 group = "it.polito.wa2.g13"
 version = "1.0.1"
@@ -40,6 +41,7 @@ dependencies {
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json")
+    implementation("org.springframework.cloud:spring-cloud-starter-netflix-eureka-client")
 
     developmentOnly("org.springframework.boot:spring-boot-docker-compose")
 
@@ -76,6 +78,11 @@ tasks.named<BootBuildImage>("bootBuildImage") {
             username = System.getenv("DOCKER_USERNAME")
             password = System.getenv("DOCKER_PASSWORD")
         }
+    }
+}
+dependencyManagement {
+    imports {
+        mavenBom("org.springframework.cloud:spring-cloud-dependencies:$springCloudVersion")
     }
 }
 

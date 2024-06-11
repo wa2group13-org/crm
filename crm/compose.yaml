@@ -48,4 +48,3 @@ networks:
 volumes:
   pgdata:
   kafka_data:
-    external: true
