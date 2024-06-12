@@ -7,6 +7,7 @@ spring:
     active:
       - dev
       - no-security
+      - api-docs
   kafka:
     consumer:
       group-id: crm-consumer
@@ -19,3 +20,22 @@ spring:
 
 kafka-config:
   mail-topic: ${MAIL_TOPIC:mail.json}
+
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false
+
+server:
+  port: ${PORT:8080}
+
+openapi:
+  base-url: ${OPENAPI_BASE_URL:http://localhost:${server.port}}
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: ${EUREKA_URI:http://localhost:8761/eureka}
+  instance:
+    preferIpAddress: true

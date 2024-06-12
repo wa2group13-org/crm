@@ -5,5 +5,6 @@ import jakarta.validation.constraints.Min
 
 data class ContactIdDTO(
     @field:Min(0)
-    val contactId: Long
+    val contactId: Long,
+    val b: Long = 0,
 )
