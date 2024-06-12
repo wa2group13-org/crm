@@ -1,6 +1,8 @@
 package it.polito.wa2.g13.crm
 
 import it.polito.wa2.g13.crm.properties.KafkaConfigProperties
+import it.polito.wa2.g13.crm.properties.OpenapiConfigProperties
+import it.polito.wa2.g13.crm.properties.ProjectConfigProperties
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.runApplication
@@ -8,6 +10,8 @@ import org.springframework.boot.runApplication
 @SpringBootApplication
 @EnableConfigurationProperties(
 	KafkaConfigProperties::class,
+	ProjectConfigProperties::class,
+	OpenapiConfigProperties::class,
 )
 class CrmApplication
 
