@@ -38,7 +38,7 @@ class OpenApiConfig(
                 .title("Customer Relationship Management API Documentation")
                 .version(projectConfigProperties.version)
         ).apply {
-            if (environment.acceptsProfiles(Profiles.of("prod && api-docs"))) {
+            if (environment.acceptsProfiles(Profiles.of("api-docs"))) {
                 this.servers(listOf(Server().url(openapiConfigProperties.baseUrl)))
             }
         }

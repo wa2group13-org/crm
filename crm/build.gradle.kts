@@ -3,16 +3,16 @@ import org.springframework.boot.gradle.tasks.bundling.BootBuildImage
 import java.util.*
 
 plugins {
+    id("idea")
+    id("org.springframework.boot") version "3.2.4"
+    id("io.spring.dependency-management") version "1.1.4"
     kotlin("jvm") version "1.9.23"
     kotlin("kapt") version "1.9.23"
     kotlin("plugin.spring") version "1.9.23"
     kotlin("plugin.jpa") version "1.9.23"
     kotlin("plugin.serialization") version "1.9.23"
-    id("idea")
-    id("org.springframework.boot") version "3.2.4"
     id("org.springdoc.openapi-gradle-plugin") version "1.8.0"
     id("org.openapi.generator") version "7.5.0"
-    id("io.spring.dependency-management") version "1.1.4"
     id("org.asciidoctor.jvm.convert") version "4.0.2"
 }
 
@@ -42,6 +42,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
     implementation("org.springframework.kafka:spring-kafka")
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json")
