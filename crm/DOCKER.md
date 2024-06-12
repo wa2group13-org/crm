@@ -9,11 +9,14 @@
 - `POSTGRES_DB`: name of the Postgres database
 - `POSTGRES_USERNAME`: username of the Postgers user
 - `POSTGRES_PASSWORD`: password of the Postgres user
-- `SPRING_PROFILES_ACTIVE`: Spring comma-separated profiles, by default `dev` and `no-security` are selected. List of
-  profiles:
+- `SPRING_PROFILES_ACTIVE`: Spring comma-separated profiles. Default: `dev`, `api-docs`, `no-security`. Values:
     - `dev`: db logs and errors are returned on responses
     - `prod`: need to specify postgres connections
     - `no-security`: filers are disables
+    - `api-docs`: enable `/v3/api-docs` and `/swagger-ui.html` endpoints
 - `JWT_ISSUER_URI`: uri of the JWT issuer, e.g. `http://keycloak:9090/realms/app`
 - `KAFKA_CONSUMER_BOOTSTRAP_SERVERS`: consumer bootstrap servers for Apache Kafka
 - `MAIL_TOPIC`: name of the mail topic. Default: `mail.json`
+- `OPENAPI_BASE_URL`: base url of this service that will appear in the OpenAPI documentation.
+  Default `http://localhost:${PORT}`
+- `PORT`: server port. Default: `8080`
