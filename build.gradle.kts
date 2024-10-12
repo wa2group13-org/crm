@@ -83,7 +83,7 @@ tasks.named<BootBuildImage>("bootBuildImage") {
     docker {
         publishRegistry {
             username = System.getenv("DOCKER_USERNAME")
-            token = System.getenv("DOCKER_TOKEN")
+            password = System.getenv("DOCKER_PASSWORD")
         }
     }
 }

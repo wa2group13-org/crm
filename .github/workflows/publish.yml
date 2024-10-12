@@ -46,7 +46,7 @@ jobs:
       - name: Push Image to Docker Hub
         env:
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-          DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_TOKEN }}
         run: |
           ./gradlew bootBuildImage --publishImage --info
 
