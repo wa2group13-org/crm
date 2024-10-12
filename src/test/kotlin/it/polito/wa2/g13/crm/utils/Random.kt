@@ -1,5 +1,6 @@
 package it.polito.wa2.g13.crm.utils
 
+import it.polito.wa2.g13.crm.dtos.CreateCustomerDTO
 import it.polito.wa2.g13.crm.data.contact.ContactCategory
 import it.polito.wa2.g13.crm.data.joboffer.JobOfferStatus
 import it.polito.wa2.g13.crm.data.message.Priority
@@ -99,6 +100,7 @@ fun randomProfessional(contactId: Long, randomRelations: Int?): CreateProfession
     employmentState = EmploymentState.entries.toTypedArray().random(),
     dailyRate = Random.nextDouble(0.0, 1e10),
     contactId = contactId,
+    contactInfo = null,
 )
 
 @Suppress("unused")
@@ -107,9 +109,9 @@ fun randomProfessionals(contactIds: List<Long>, randomRelations: Int?): List<Cre
     .toList()
 
 fun randomCustomer(contact: ContactDTO/*, randomRelations: Int?*/): CreateCustomerDTO = CreateCustomerDTO(
-    jobOffers = listOf(),
-    contact = contact,
     note = UUID.randomUUID().toString(),
+    contactId = contact.id,
+    contactInfo = null,
 )
 
 @Suppress("unused")

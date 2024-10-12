@@ -3,6 +3,7 @@ package it.polito.wa2.g13.crm.services
 import it.polito.wa2.g13.crm.IntegrationTest
 import it.polito.wa2.g13.crm.data.contact.ContactCategory
 import it.polito.wa2.g13.crm.dtos.ContactDTO
+import it.polito.wa2.g13.crm.dtos.CreateCustomerDTO
 import it.polito.wa2.g13.crm.dtos.CustomerDTO
 import it.polito.wa2.g13.crm.exceptions.ContactException
 import it.polito.wa2.g13.crm.exceptions.CustomerException
@@ -13,7 +14,6 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.transaction.annotation.Transactional
@@ -22,7 +22,7 @@ import org.springframework.transaction.annotation.Transactional
 @Transactional
 class CustomerServiceImplTest : IntegrationTest() {
     companion object {
-        private val logger = LoggerFactory.getLogger(CustomerServiceImplTest::class.java)
+//        private val logger = LoggerFactory.getLogger(CustomerServiceImplTest::class.java)
         private val createContacts = randomContacts(10, 5).map { it.copy(category = ContactCategory.Unknown) }
         private val _contacts = mutableListOf<ContactDTO>()
         private val contacts: List<ContactDTO> = _contacts
@@ -34,7 +34,7 @@ class CustomerServiceImplTest : IntegrationTest() {
         fun init(@Autowired contactService: ContactService, @Autowired customerService: CustomerService) {
             createContacts.forEach { createContactDTO ->
                 val contactDTO = contactService.createContact(createContactDTO)
-                val customerDTO = customerService.createCustomer(contactDTO.id)
+                val customerDTO = customerService.createCustomer(CreateCustomerDTO.from(contactDTO.id))
                 _contacts.add(contactDTO)
                 _customers.add(customerDTO)
             }
@@ -67,19 +67,25 @@ class CustomerServiceImplTest : IntegrationTest() {
     @Test
     fun `create new valid customer`() {
         val contactDTO = contactService.createContact(randomContact().copy(category = ContactCategory.Unknown))
-        val customerDTO = customerService.createCustomer(contactDTO.id)
+        val customerDTO = customerService.createCustomer(CreateCustomerDTO.Companion.from(contactDTO.id))
         val testCustomerDTO = customerService.getCustomerById(customerDTO.id)
         assertRecursive(customerDTO, testCustomerDTO)
     }
 
     @Test
     fun `failed to create a new customer because contact id is absent`() {
-        assertThrows<ContactException.NotFound> { customerService.createCustomer(-1) }
+        assertThrows<ContactException.NotFound> { customerService.createCustomer(CreateCustomerDTO.from(-1)) }
     }
 
     @Test
     fun `failing to create a customer, contact already linked to someone else`() {
-        assertThrows<CustomerException.ContactAlreadyTaken> { customerService.createCustomer(contacts[0].id) }
+        assertThrows<CustomerException.ContactAlreadyTaken> {
+            customerService.createCustomer(
+                CreateCustomerDTO.from(
+                    contacts[0].id
+                )
+            )
+        }
     }
 
     @Test

@@ -59,7 +59,7 @@ class CustomerControllerTest : IntegrationTest() {
         contacts.clear()
         createContacts.forEach { contact ->
             val contactDTO = contactService.createContact(contact)
-            val customerDTO = customerService.createCustomer(contactDTO.id)
+            val customerDTO = customerService.createCustomer(CreateCustomerDTO.from(contactDTO.id))
             contacts.add(contactDTO)
             customers.add(customerDTO)
         }
@@ -180,7 +180,7 @@ class CustomerControllerTest : IntegrationTest() {
     @Test
     fun `update absent customer note, expected 404 `() {
         val customerId = -1
-        val note = "My Test Note"
+//        val note = "My Test Note"
         val req = RequestEntity.put("/API/customers/$customerId/note").body(CustomerNoteDTO("My Test Note"))
         val res = restClient.exchange<ProblemDetail>(req)
 

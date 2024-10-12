@@ -1,5 +1,6 @@
 package it.polito.wa2.g13.crm.services
 
+import it.polito.wa2.g13.crm.data.contact.Contact
 import it.polito.wa2.g13.crm.data.contact.ContactCategory
 import it.polito.wa2.g13.crm.data.professional.EmploymentState
 import it.polito.wa2.g13.crm.data.professional.Professional
@@ -23,16 +24,20 @@ import org.springframework.transaction.annotation.Transactional
 class ProfessionalServiceImpl(
     val professionalRepository: ProfessionalRepository,
     val contactRepository: ContactRepository,
+    val contactService: ContactService,
 ) : ProfessionalService {
     companion object {
         private val logger = LoggerFactory.getLogger(ProfessionalServiceImpl::class.java)
     }
 
     private fun createProfessionalEntity(professionalDto: CreateProfessionalDTO): Professional {
-        val contact =
+        val contact = if (professionalDto.contactInfo == null) {
             contactRepository.findById(professionalDto.contactId).nullable() ?: throw ContactException.NotFound.from(
                 professionalDto.contactId
             )
+        } else {
+            Contact.from(contactService.createContact(professionalDto.contactInfo))
+        }
 
         if (contact.category != ContactCategory.Unknown)
             throw ProfessionalException.InvalidContactState.from(contact.id)

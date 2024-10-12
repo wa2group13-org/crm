@@ -41,7 +41,7 @@ class JobOfferServiceImplTest : IntegrationTest() {
         val contacts = randomCategorizedContacts(n, n, ContactCategory.Unknown)
         val contactsIds = contacts.map { contactService.createContact(it).id }.toList()
 //        randomCustomers(contactService.getContacts(0, 10, null, null, null))
-        val customersIds = contactsIds.map { customerService.createCustomer(it).id }.toList()
+        val customersIds = contactsIds.map { customerService.createCustomer(CreateCustomerDTO.from(it)).id }.toList()
         val jobOffers = randomJobOffers(customersIds, n, JobOfferStatus.Created)
         val jobOffersIds = jobOffers.map { jobOfferService.createJobOffer(it).id }.toMutableList()
 
@@ -54,7 +54,7 @@ class JobOfferServiceImplTest : IntegrationTest() {
         val contactsP = randomCategorizedContacts(n, n, ContactCategory.Unknown)
         val contactsPIds = contactsP.map { contactService.createContact(it).id }.toList()
 
-        val customerIds = contactsCIds.map { customerService.createCustomer(it).id }
+        val customerIds = contactsCIds.map { customerService.createCustomer(CreateCustomerDTO.Companion.from(it)).id }
         val newProfessionals = contactsPIds.map {
             professionalService.createProfessional(
                 // A professional should be available in order to be assigned to a jobOffer
@@ -165,7 +165,7 @@ class JobOfferServiceImplTest : IntegrationTest() {
         val contact = randomCategorizedContact(category = ContactCategory.Unknown)
         val contactId = contactService.createContact(contact).id
         randomCustomer(contactService.getContactById(contactId))
-        val customer = customerService.createCustomer(contactId)
+        val customer = customerService.createCustomer(CreateCustomerDTO.Companion.from(contactId))
         val newJobOffer = randomJobOffer(customer.id, null, null)
 
         val newJobOfferDTO = jobOfferService.createJobOffer(newJobOffer)

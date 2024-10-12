@@ -1,6 +1,9 @@
 package it.polito.wa2.g13.crm.dtos
 
 import it.polito.wa2.g13.crm.data.customer.Customer
+import jakarta.validation.Valid
+import jakarta.validation.constraints.NotBlank
+import jakarta.validation.constraints.Size
 
 data class CustomerDTO(
     val id: Long,
@@ -20,16 +23,26 @@ data class CustomerDTO(
 }
 
 data class CreateCustomerDTO(
-    val jobOffers: List<JobOfferDTO>,
+    @field:Size(min = 1, max = 5000)
+    @field:NotBlank
     val note: String?,
-    val contact: ContactDTO
+    val contactId: Long,
+    @field:Valid
+    val contactInfo: CreateContactDTO?
 ) {
     companion object {
         @JvmStatic
         fun from(customerDTO: CustomerDTO): CreateCustomerDTO = CreateCustomerDTO(
-            jobOffers = customerDTO.jobOffers,
             note = customerDTO.note,
-            contact = customerDTO.contact
+            contactId = customerDTO.contact.id,
+            contactInfo = null,
+        )
+
+        @JvmStatic
+        fun from(contactId: Long): CreateCustomerDTO = CreateCustomerDTO(
+            note = null,
+            contactId = contactId,
+            contactInfo = null,
         )
     }
 }
