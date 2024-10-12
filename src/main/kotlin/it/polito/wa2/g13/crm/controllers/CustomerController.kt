@@ -1,6 +1,7 @@
 package it.polito.wa2.g13.crm.controllers
 
 import it.polito.wa2.g13.crm.dtos.ContactIdDTO
+import it.polito.wa2.g13.crm.dtos.CreateCustomerDTO
 import it.polito.wa2.g13.crm.dtos.CustomerDTO
 import it.polito.wa2.g13.crm.dtos.CustomerNoteDTO
 import it.polito.wa2.g13.crm.services.CustomerService
@@ -31,8 +32,8 @@ class CustomerController(private val customerService: CustomerService) {
 
     @PostMapping("", "/")
     @ResponseStatus(HttpStatus.CREATED)
-    fun createCustomer(@RequestBody contactIdDTO: ContactIdDTO): CustomerDTO {
-        return customerService.createCustomer(contactIdDTO.contactId)
+    fun createCustomer(@RequestBody customerDto: CreateCustomerDTO): CustomerDTO {
+        return customerService.createCustomer(customerDto)
     }
 
     @DeleteMapping("/{customerId}")

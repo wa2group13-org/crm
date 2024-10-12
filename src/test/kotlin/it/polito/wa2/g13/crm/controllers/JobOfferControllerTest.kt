@@ -53,7 +53,7 @@ class JobOfferControllerTest : IntegrationTest() {
 
         customersIds.addAll(
             contactsIds.map {
-                customerService.createCustomer(it).id
+                customerService.createCustomer(CreateCustomerDTO.from(it)).id
             }.toMutableList()
         )
 
@@ -142,7 +142,7 @@ class JobOfferControllerTest : IntegrationTest() {
     @Test
     fun `createJobOffer should successfully create a job offer`() {
         val contactId = contactService.createContact(randomCategorizedContact(category = ContactCategory.Unknown)).id
-        val customer = customerService.createCustomer(contactId)
+        val customer = customerService.createCustomer(CreateCustomerDTO.from(contactId))
 
         val jobOffer = randomJobOffer(customer.id, 3, JobOfferStatus.Created)
         val uri = "/API/joboffers"

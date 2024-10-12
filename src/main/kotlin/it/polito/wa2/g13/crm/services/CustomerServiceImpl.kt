@@ -1,7 +1,9 @@
 package it.polito.wa2.g13.crm.services
 
+import it.polito.wa2.g13.crm.data.contact.Contact
 import it.polito.wa2.g13.crm.data.contact.ContactCategory
 import it.polito.wa2.g13.crm.data.customer.Customer
+import it.polito.wa2.g13.crm.dtos.CreateCustomerDTO
 import it.polito.wa2.g13.crm.dtos.CustomerDTO
 import it.polito.wa2.g13.crm.exceptions.ContactException
 import it.polito.wa2.g13.crm.exceptions.CustomerException
@@ -18,6 +20,7 @@ import org.springframework.stereotype.Service
 class CustomerServiceImpl(
     private val customerRepository: CustomerRepository,
     private val contactRepository: ContactRepository,
+    private val contactService: ContactService,
 ) : CustomerService {
     override fun getCustomers(page: Int, limit: Int): Page<CustomerDTO> {
         return customerRepository.findAll(PageRequest.of(page, limit)).map { CustomerDTO.from(it) }
@@ -28,18 +31,24 @@ class CustomerServiceImpl(
             ?: throw CustomerException.NotFound.from(id)
     }
 
-    override fun createCustomer(contactId: Long): CustomerDTO {
-        val contact =
-            contactRepository.findById(contactId).nullable() ?: throw ContactException.NotFound.from(
-                contactId
+    override fun createCustomer(customerDto: CreateCustomerDTO): CustomerDTO {
+        val contact = if (customerDto.contactInfo == null) {
+            contactRepository.findById(customerDto.contactId).nullable() ?: throw ContactException.NotFound.from(
+                customerDto.contactId
             )
+        } else {
+            Contact.from(contactService.createContact(customerDto.contactInfo))
+        }
+
         if (contact.category != ContactCategory.Unknown) throw CustomerException.ContactAlreadyTaken.from(
-            contactId
+            customerDto.contactId
         )
+
         val customer = Customer.createNewCustomer(contact)
         contact.category = ContactCategory.Customer
-        customerRepository.save(customer)
-        return CustomerDTO.from(customer)
+        val newCustomer = customerRepository.save(customer)
+
+        return CustomerDTO.from(newCustomer)
     }
 
     override fun deleteCustomerById(customerId: Long) {
