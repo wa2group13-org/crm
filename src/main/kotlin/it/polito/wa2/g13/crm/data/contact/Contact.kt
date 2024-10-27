@@ -59,7 +59,7 @@ class Contact(
         @JvmStatic
         fun from(contact: ContactDTO): Contact = Contact(
             name = contact.name,
-            surname = contact.name,
+            surname = contact.surname,
             category = contact.category,
             ssn = contact.ssn,
             telephones = mutableSetOf(),

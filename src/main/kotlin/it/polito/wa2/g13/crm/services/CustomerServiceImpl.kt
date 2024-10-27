@@ -1,6 +1,5 @@
 package it.polito.wa2.g13.crm.services
 
-import it.polito.wa2.g13.crm.data.contact.Contact
 import it.polito.wa2.g13.crm.data.contact.ContactCategory
 import it.polito.wa2.g13.crm.data.customer.Customer
 import it.polito.wa2.g13.crm.dtos.CreateCustomerDTO
@@ -37,14 +36,15 @@ class CustomerServiceImpl(
                 customerDto.contactId
             )
         } else {
-            Contact.from(contactService.createContact(customerDto.contactInfo))
+            val newContact = contactService.createContact(customerDto.contactInfo)
+            contactRepository.findById(newContact.id).nullable()!!
         }
 
         if (contact.category != ContactCategory.Unknown) throw CustomerException.ContactAlreadyTaken.from(
             customerDto.contactId
         )
 
-        val customer = Customer.createNewCustomer(contact)
+        val customer = Customer.from(customerDto, contact)
         contact.category = ContactCategory.Customer
         val newCustomer = customerRepository.save(customer)
 

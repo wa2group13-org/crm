@@ -114,6 +114,12 @@ fun randomCustomer(contact: ContactDTO/*, randomRelations: Int?*/): CreateCustom
     contactInfo = null,
 )
 
+fun randomCustomerWithContact(contact: CreateContactDTO): CreateCustomerDTO = CreateCustomerDTO(
+    note = UUID.randomUUID().toString(),
+    contactId = 0,
+    contactInfo = contact,
+)
+
 @Suppress("unused")
 fun randomCustomers(contacts: List<ContactDTO>/*, randomRelations: Int?*/): List<CreateCustomerDTO> = contacts
     .map { randomCustomer(it/*, randomRelations*/) }

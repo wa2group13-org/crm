@@ -2,14 +2,13 @@ package it.polito.wa2.g13.crm.services
 
 import it.polito.wa2.g13.crm.IntegrationTest
 import it.polito.wa2.g13.crm.data.contact.ContactCategory
-import it.polito.wa2.g13.crm.dtos.CreateContactDTO
-import it.polito.wa2.g13.crm.dtos.CreateProfessionalDTO
-import it.polito.wa2.g13.crm.dtos.LocationFilter
-import it.polito.wa2.g13.crm.dtos.ProfessionalFilters
+import it.polito.wa2.g13.crm.dtos.*
 import it.polito.wa2.g13.crm.exceptions.ProfessionalException
 import it.polito.wa2.g13.crm.utils.assertRecursive
 import it.polito.wa2.g13.crm.utils.randomContacts
 import it.polito.wa2.g13.crm.utils.randomProfessional
+import org.assertj.core.api.Assertions
+import org.assertj.core.api.recursive.comparison.RecursiveComparisonConfiguration
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
@@ -75,6 +74,32 @@ class ProfessionalServiceImplTest : IntegrationTest() {
 
         assertEquals(ContactCategory.Professional, p.contact.category)
         assertRecursive(c, p.contact)
+    }
+
+    @Test
+    fun `create professional with contact`() {
+        val contact = randomContacts(1, 10).first().copy(category = ContactCategory.Unknown)
+        val professional = randomProfessional(0, 10).copy(contactInfo = contact)
+
+        val newProfessional = professionalService.createProfessional(professional)
+
+        println(contact.toString())
+        println(newProfessional.contact.toString())
+
+        assertRecursive(
+            contact.copy(category = ContactCategory.Professional),
+            CreateContactDTO.from(newProfessional.contact)
+        )
+
+        Assertions.assertThat(CreateProfessionalDTO.from(newProfessional))
+            .usingRecursiveComparison(
+                RecursiveComparisonConfiguration
+                    .builder()
+                    .withIgnoreCollectionOrder(true)
+                    .withIgnoredFields("contactId", "contactInfo")
+                    .build()
+            )
+            .isEqualTo(professional)
     }
 
     @Test
