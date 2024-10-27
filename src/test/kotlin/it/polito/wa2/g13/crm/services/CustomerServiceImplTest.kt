@@ -2,14 +2,12 @@ package it.polito.wa2.g13.crm.services
 
 import it.polito.wa2.g13.crm.IntegrationTest
 import it.polito.wa2.g13.crm.data.contact.ContactCategory
-import it.polito.wa2.g13.crm.dtos.ContactDTO
-import it.polito.wa2.g13.crm.dtos.CreateCustomerDTO
-import it.polito.wa2.g13.crm.dtos.CustomerDTO
+import it.polito.wa2.g13.crm.dtos.*
 import it.polito.wa2.g13.crm.exceptions.ContactException
 import it.polito.wa2.g13.crm.exceptions.CustomerException
-import it.polito.wa2.g13.crm.utils.assertRecursive
-import it.polito.wa2.g13.crm.utils.randomContact
-import it.polito.wa2.g13.crm.utils.randomContacts
+import it.polito.wa2.g13.crm.utils.*
+import org.assertj.core.api.Assertions
+import org.assertj.core.api.recursive.comparison.RecursiveComparisonConfiguration
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
@@ -22,7 +20,7 @@ import org.springframework.transaction.annotation.Transactional
 @Transactional
 class CustomerServiceImplTest : IntegrationTest() {
     companion object {
-//        private val logger = LoggerFactory.getLogger(CustomerServiceImplTest::class.java)
+        //        private val logger = LoggerFactory.getLogger(CustomerServiceImplTest::class.java)
         private val createContacts = randomContacts(10, 5).map { it.copy(category = ContactCategory.Unknown) }
         private val _contacts = mutableListOf<ContactDTO>()
         private val contacts: List<ContactDTO> = _contacts
@@ -70,6 +68,29 @@ class CustomerServiceImplTest : IntegrationTest() {
         val customerDTO = customerService.createCustomer(CreateCustomerDTO.Companion.from(contactDTO.id))
         val testCustomerDTO = customerService.getCustomerById(customerDTO.id)
         assertRecursive(customerDTO, testCustomerDTO)
+    }
+
+    @Test
+    fun `create customer with contact`() {
+        val contact = randomContacts(1, 10).first().copy(category = ContactCategory.Unknown)
+        val customer = randomCustomerWithContact(contact)
+
+        val newCustomer = customerService.createCustomer(customer)
+
+        assertRecursive(
+            contact.copy(category = ContactCategory.Customer),
+            CreateContactDTO.from(newCustomer.contact)
+        )
+
+        Assertions.assertThat(customer)
+            .usingRecursiveComparison(
+                RecursiveComparisonConfiguration
+                    .builder()
+                    .withIgnoreCollectionOrder(true)
+                    .withIgnoredFields("contactId", "contactInfo")
+                    .build()
+            )
+            .isEqualTo(CreateCustomerDTO.Companion.from(newCustomer))
     }
 
     @Test
