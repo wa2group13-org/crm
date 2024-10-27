@@ -1,6 +1,5 @@
 package it.polito.wa2.g13.crm.services
 
-import it.polito.wa2.g13.crm.data.contact.Contact
 import it.polito.wa2.g13.crm.data.contact.ContactCategory
 import it.polito.wa2.g13.crm.data.professional.EmploymentState
 import it.polito.wa2.g13.crm.data.professional.Professional
@@ -36,7 +35,8 @@ class ProfessionalServiceImpl(
                 professionalDto.contactId
             )
         } else {
-            Contact.from(contactService.createContact(professionalDto.contactInfo))
+            val newContact = contactService.createContact(professionalDto.contactInfo)
+            contactRepository.findById(newContact.id).nullable()!!
         }
 
         if (contact.category != ContactCategory.Unknown)
