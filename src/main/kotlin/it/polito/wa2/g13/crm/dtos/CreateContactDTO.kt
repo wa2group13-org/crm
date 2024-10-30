@@ -71,6 +71,9 @@ data class CreateAddressDTO(
     @field:NotBlank
     @field:Size(max = 255)
     val postalCode: String,
+    @field:NotBlank
+    @field:Size(max = 255)
+    val country: String,
 ) {
     companion object {
         @JvmStatic
@@ -79,6 +82,7 @@ data class CreateAddressDTO(
             street = address.street,
             city = address.city,
             postalCode = address.postalCode,
+            country = address.country,
         )
 
         @JvmStatic
@@ -87,6 +91,7 @@ data class CreateAddressDTO(
             street = address.street,
             city = address.city,
             postalCode = address.postalCode,
+            country = address.country,
         )
     }
 }

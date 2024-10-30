@@ -133,12 +133,14 @@ class ProfessionalServiceImplTest : IntegrationTest() {
             0, 10, ProfessionalFilters(
                 bySkills = professionalToFilter.skills.map { it.skill }.toSet(),
                 byEmploymentState = professionalToFilter.employmentState,
+                byFullName = null,
                 byLocation = LocationFilter(
                     byPostalCode = address.postalCode,
                     byCity = address.city,
                     byStreet = address.street,
                     byCivic = address.civic,
-                )
+                    byCountry = null,
+                ),
             )
         )
 
@@ -155,15 +157,35 @@ class ProfessionalServiceImplTest : IntegrationTest() {
             0, 10, ProfessionalFilters(
                 bySkills = professionalToFilter.skills.map { it.skill }.toSet(),
                 byEmploymentState = professionalToFilter.employmentState,
+                byFullName = null,
                 byLocation = LocationFilter(
                     byPostalCode = address.postalCode,
                     byCity = address.city,
                     byStreet = address.street,
                     byCivic = address.civic,
+                    byCountry = address.country,
                 )
             )
         )
 
         assertEquals(0, gotProfessional.content.size)
+    }
+
+    @Test
+    fun `filter by partial full name`() {
+        val professionalToFilter = professionals.first()
+        val address = contacts.first()
+
+        val gotProfessional = professionalService.getProfessionals(
+            0, 10, ProfessionalFilters(
+                bySkills = null,
+                byEmploymentState = null,
+                byFullName = "${address.name.takeLast(5)} ${address.surname.take(5)}",
+                byLocation = null,
+            )
+        )
+
+        assertEquals(1, gotProfessional.content.size)
+        assertRecursive(professionalToFilter, CreateProfessionalDTO.from(gotProfessional.content[0]))
     }
 }

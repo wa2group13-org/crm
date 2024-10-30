@@ -25,6 +25,7 @@ fun randomAddress(): CreateAddressDTO = CreateAddressDTO(
     street = UUID.randomUUID().toString(),
     city = UUID.randomUUID().toString(),
     postalCode = UUID.randomUUID().toString(),
+    country = UUID.randomUUID().toString(),
 )
 
 fun randomAddresses(n: Int): List<CreateAddressDTO> = generateSequence { randomAddress() }.take(n).toList()

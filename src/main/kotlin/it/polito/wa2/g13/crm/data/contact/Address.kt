@@ -12,6 +12,7 @@ class Address(
     var street: String,
     var city: String,
     var postalCode: String,
+    var country: String,
 
     @ManyToMany(fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
     @JoinTable(
@@ -28,6 +29,7 @@ class Address(
             street = address.street,
             city = address.city,
             postalCode = address.postalCode,
+            country = address.country,
             contacts = mutableSetOf(),
         )
 
@@ -37,6 +39,7 @@ class Address(
             street = address.street,
             city = address.city,
             postalCode = address.postalCode,
+            country = address.country,
             contacts = mutableSetOf(),
         )
     }

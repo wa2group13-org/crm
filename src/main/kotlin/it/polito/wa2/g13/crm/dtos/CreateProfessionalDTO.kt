@@ -41,6 +41,11 @@ data class CreateProfessionalDTO(
     }
 }
 
+/**
+ * With [JsonCreator] and [JsonValue] it's possible to parse
+ * this class a string, so the final result will be just
+ * a [Set] of [String]
+ */
 data class CreateSkillDTO @JsonCreator constructor(
     @field:NotBlank
     @field:Size(max = 255)

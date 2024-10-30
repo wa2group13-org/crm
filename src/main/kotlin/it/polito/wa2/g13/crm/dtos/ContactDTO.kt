@@ -29,6 +29,7 @@ data class ContactDTO(
                     street = it.street,
                     city = it.city,
                     postalCode = it.postalCode,
+                    country = it.country,
                 )
             }.toList(),
         )
@@ -67,6 +68,7 @@ data class AddressDTO(
     val street: String,
     val city: String,
     val postalCode: String,
+    val country: String,
 ) {
     companion object {
         @JvmStatic
@@ -76,6 +78,7 @@ data class AddressDTO(
             street = address.street,
             city = address.city,
             postalCode = address.postalCode,
+            country = address.country,
         )
     }
 }

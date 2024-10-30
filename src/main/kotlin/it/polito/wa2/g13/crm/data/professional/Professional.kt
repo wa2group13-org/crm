@@ -83,6 +83,24 @@ class Professional(
                     predicates.add(predicate)
                 }
 
+                // Filter by fullName
+                if (filters.byFullName != null) {
+                    val contact = professional.get<Contact>("contact")
+
+                    val predicate = professional.join<Professional, Contact>("contact").on(
+                        criteriaBuilder.like(
+                            criteriaBuilder.lower(
+                                criteriaBuilder.concat(
+                                    criteriaBuilder.concat(contact.get("name"), criteriaBuilder.literal(" ")),
+                                    contact.get("surname")
+                                )
+                            ), "%${filters.byFullName.lowercase()}%"
+                        )
+                    ).on
+
+                    predicates.add(predicate)
+                }
+
                 // Filter by location
                 if (filters.byLocation != null) {
                     val addressSubquery = query.subquery(Address::class.java)
@@ -95,7 +113,7 @@ class Professional(
 
                     val addFilter = { filter: String, name: String ->
                         filterPredicates.add(
-                            criteriaBuilder.equal(address.get<String>(name), filter)
+                            criteriaBuilder.like(criteriaBuilder.lower(address.get(name)), "%${filter.lowercase()}%")
                         )
                     }
 
@@ -113,6 +131,10 @@ class Professional(
 
                     filters.byLocation.byPostalCode?.let {
                         addFilter(it, "postalCode")
+                    }
+
+                    filters.byLocation.byCountry?.let {
+                        addFilter(it, "country")
                     }
 
                     addressSubquery.select(address)
