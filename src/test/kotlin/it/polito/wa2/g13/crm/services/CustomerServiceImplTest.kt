@@ -47,7 +47,7 @@ class CustomerServiceImplTest : IntegrationTest() {
 
     @Test
     fun `get all customers, expected 200`() {
-        val testCustomers = customerService.getCustomers(0, 50)
+        val testCustomers = customerService.getCustomers(0, 50, CustomerFilters(null, null))
         assertRecursive(customers, testCustomers)
     }
 
@@ -154,5 +154,63 @@ class CustomerServiceImplTest : IntegrationTest() {
                 customers[1].contact.id
             )
         }
+    }
+
+    @Test
+    fun `filtering customers should return only the first one`() {
+        val customerToFind = customers.first()
+        val address = contacts.first().addresses.first()
+
+        val gotCustomers = customerService.getCustomers(
+            0, 10, CustomerFilters(
+                byFullName = null,
+                byLocation = LocationFilter(
+                    byPostalCode = address.postalCode,
+                    byCity = address.city,
+                    byStreet = address.street,
+                    byCivic = address.civic,
+                    byCountry = address.country,
+                ),
+            )
+        )
+
+        assertEquals(1, gotCustomers.content.size)
+        assertRecursive(CreateCustomerDTO.from(customerToFind), CreateCustomerDTO.from(gotCustomers.content[0]))
+    }
+
+    @Test
+    fun `filtering by wrong location should fail`() {
+        val address = contacts[1].addresses.first()
+
+        val gotProfessional = customerService.getCustomers(
+            0, 10, CustomerFilters(
+                byFullName = null,
+                byLocation = LocationFilter(
+                    byPostalCode = contacts.first().addresses.first().postalCode,
+                    byCity = address.city,
+                    byStreet = address.street,
+                    byCivic = address.civic,
+                    byCountry = address.country,
+                )
+            )
+        )
+
+        assertEquals(0, gotProfessional.content.size)
+    }
+
+    @Test
+    fun `filter contacts by partial full name`() {
+        val customerToFilter = customers.first()
+        val address = contacts.first()
+
+        val gotProfessional = customerService.getCustomers(
+            0, 10, CustomerFilters(
+                byFullName = "${address.name.takeLast(5)} ${address.surname.take(5)}",
+                byLocation = null,
+            )
+        )
+
+        assertEquals(1, gotProfessional.content.size)
+        assertRecursive(CreateCustomerDTO.from(customerToFilter), CreateCustomerDTO.from(gotProfessional.content[0]))
     }
 }

@@ -4,12 +4,14 @@ import it.polito.wa2.g13.crm.data.contact.ContactCategory
 import it.polito.wa2.g13.crm.data.customer.Customer
 import it.polito.wa2.g13.crm.dtos.CreateCustomerDTO
 import it.polito.wa2.g13.crm.dtos.CustomerDTO
+import it.polito.wa2.g13.crm.dtos.CustomerFilters
 import it.polito.wa2.g13.crm.exceptions.ContactException
 import it.polito.wa2.g13.crm.exceptions.CustomerException
 import it.polito.wa2.g13.crm.repositories.ContactRepository
 import it.polito.wa2.g13.crm.repositories.CustomerRepository
 import it.polito.wa2.g13.crm.utils.nullable
 import jakarta.transaction.Transactional
+import org.slf4j.LoggerFactory
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
@@ -21,8 +23,17 @@ class CustomerServiceImpl(
     private val contactRepository: ContactRepository,
     private val contactService: ContactService,
 ) : CustomerService {
-    override fun getCustomers(page: Int, limit: Int): Page<CustomerDTO> {
-        return customerRepository.findAll(PageRequest.of(page, limit)).map { CustomerDTO.from(it) }
+    companion object {
+        private val logger = LoggerFactory.getLogger(ProfessionalServiceImpl::class.java)
+    }
+
+    override fun getCustomers(page: Int, limit: Int, customerFilters: CustomerFilters): Page<CustomerDTO> {
+        return customerRepository
+            .findAll(
+                Customer.Spec.withFilters(customerFilters),
+                PageRequest.of(page, limit)
+            )
+            .map { CustomerDTO.from(it) }
     }
 
     override fun getCustomerById(id: Long): CustomerDTO {
@@ -48,6 +59,8 @@ class CustomerServiceImpl(
         contact.category = ContactCategory.Customer
         val newCustomer = customerRepository.save(customer)
 
+        logger.info("${::createCustomer.name}: Created ${Customer::class.qualifiedName}@${newCustomer.id}")
+
         return CustomerDTO.from(newCustomer)
     }
 
@@ -56,6 +69,8 @@ class CustomerServiceImpl(
             customerRepository.findById(customerId).nullable() ?: throw CustomerException.NotFound.from(customerId)
         customer.contact.category = ContactCategory.Unknown
         customerRepository.delete(customer)
+
+        logger.info("${::deleteCustomerById.name}: Deleted ${Customer::class.qualifiedName}@${customer.id}")
     }
 
     override fun updateCustomerContact(customerId: Long, contactId: Long) {
