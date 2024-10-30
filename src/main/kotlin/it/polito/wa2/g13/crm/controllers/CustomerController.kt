@@ -1,9 +1,6 @@
 package it.polito.wa2.g13.crm.controllers
 
-import it.polito.wa2.g13.crm.dtos.ContactIdDTO
-import it.polito.wa2.g13.crm.dtos.CreateCustomerDTO
-import it.polito.wa2.g13.crm.dtos.CustomerDTO
-import it.polito.wa2.g13.crm.dtos.CustomerNoteDTO
+import it.polito.wa2.g13.crm.dtos.*
 import it.polito.wa2.g13.crm.services.CustomerService
 import org.springframework.data.domain.Page
 import org.springframework.http.HttpStatus
@@ -20,8 +17,9 @@ class CustomerController(private val customerService: CustomerService) {
     fun getCustomers(
         @RequestParam("page") page: Int,
         @RequestParam("limit") limit: Int,
+        customerFilters: CustomerFilters,
     ): Page<CustomerDTO> {
-        return customerService.getCustomers(page, limit)
+        return customerService.getCustomers(page, limit, customerFilters)
     }
 
     @GetMapping("/{customerId}")

@@ -27,3 +27,10 @@ data class ProfessionalFilters(
     @field:Size(min = 1, max = 255)
     val byFullName: String?,
 )
+
+data class CustomerFilters(
+    @field:Valid
+    val byLocation: LocationFilter?,
+    @field:Size(min = 1, max = 255)
+    val byFullName: String?,
+)
