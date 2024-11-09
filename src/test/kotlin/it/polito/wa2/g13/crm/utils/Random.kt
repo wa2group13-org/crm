@@ -98,7 +98,14 @@ fun randomProfessional(contactId: Long, randomRelations: Int?): CreateProfession
     notes = UUID.randomUUID().toString(),
     skills = randomRelations?.let { (0..it).map { CreateSkillDTO.from(UUID.randomUUID().toString()) }.toSet() }
         ?: setOf(),
-    employmentState = EmploymentState.entries.toTypedArray().random(),
+    employmentState = EmploymentState
+        .entries
+        .let {
+            val v = it.toMutableList()
+            v.remove(EmploymentState.Employed)
+            v
+        }
+        .random(),
     dailyRate = Random.nextDouble(0.0, 1e10),
     contactId = contactId,
     contactInfo = null,
