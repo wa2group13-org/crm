@@ -2,6 +2,7 @@ package it.polito.wa2.g13.crm.controllers
 
 import it.polito.wa2.g13.crm.IntegrationTest
 import it.polito.wa2.g13.crm.data.contact.ContactCategory
+import it.polito.wa2.g13.crm.data.professional.EmploymentState
 import it.polito.wa2.g13.crm.dtos.CreateContactDTO
 import it.polito.wa2.g13.crm.dtos.CreateProfessionalDTO
 import it.polito.wa2.g13.crm.dtos.ProfessionalDTO
@@ -213,5 +214,17 @@ class ProfessionalControllerTest : IntegrationTest() {
             .body
 
         assertRecursive(newProfessional, updatedProfessional?.let { CreateProfessionalDTO.from(it) })
+    }
+
+    @Test
+    fun `cannot insert a professional with Employed state`() {
+        val professional = newProfessional().first.copy(employmentState = EmploymentState.Employed)
+
+        val error = restClient
+            .exchange<Any>(
+                RequestEntity.post("/API/professionals").body(professional, CreateProfessionalDTO::class.java)
+            )
+
+        assertTrue(error.statusCode.is4xxClientError)
     }
 }

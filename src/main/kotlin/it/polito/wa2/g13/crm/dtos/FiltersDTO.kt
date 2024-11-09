@@ -26,7 +26,22 @@ data class ProfessionalFilters(
     val byLocation: LocationFilter?,
     @field:Size(min = 1, max = 255)
     val byFullName: String?,
-)
+    @field:Valid
+    val withState: List<EmploymentState>?,
+    @field:Valid
+    val withoutState: List<EmploymentState>?,
+) {
+    companion object {
+        fun empty() = ProfessionalFilters(
+            bySkills = null,
+            byEmploymentState = null,
+            byLocation = null,
+            byFullName = null,
+            withState = null,
+            withoutState = null,
+        )
+    }
+}
 
 data class CustomerFilters(
     @field:Valid

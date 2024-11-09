@@ -2,6 +2,7 @@ package it.polito.wa2.g13.crm.services
 
 import it.polito.wa2.g13.crm.IntegrationTest
 import it.polito.wa2.g13.crm.data.contact.ContactCategory
+import it.polito.wa2.g13.crm.data.professional.EmploymentState
 import it.polito.wa2.g13.crm.dtos.*
 import it.polito.wa2.g13.crm.exceptions.ProfessionalException
 import it.polito.wa2.g13.crm.utils.assertRecursive
@@ -141,6 +142,8 @@ class ProfessionalServiceImplTest : IntegrationTest() {
                     byCivic = address.civic,
                     byCountry = null,
                 ),
+                withState = null,
+                withoutState = null,
             )
         )
 
@@ -164,7 +167,9 @@ class ProfessionalServiceImplTest : IntegrationTest() {
                     byStreet = address.street,
                     byCivic = address.civic,
                     byCountry = address.country,
-                )
+                ),
+                withoutState = null,
+                withState = null,
             )
         )
 
@@ -177,15 +182,38 @@ class ProfessionalServiceImplTest : IntegrationTest() {
         val address = contacts.first()
 
         val gotProfessional = professionalService.getProfessionals(
-            0, 10, ProfessionalFilters(
-                bySkills = null,
-                byEmploymentState = null,
+            0, 10, ProfessionalFilters.empty().copy(
                 byFullName = "${address.name.takeLast(5)} ${address.surname.take(5)}",
-                byLocation = null,
             )
         )
 
         assertEquals(1, gotProfessional.content.size)
         assertRecursive(professionalToFilter, CreateProfessionalDTO.from(gotProfessional.content[0]))
+    }
+
+    @Test
+    fun `filter by present state`() {
+        val state = EmploymentState.Available
+
+        val gotProfessionals = professionalService.getProfessionals(
+            0, 10, ProfessionalFilters.empty().copy(
+                withState = listOf(state)
+            )
+        )
+
+        assertEquals(professionals.count { it.employmentState == state }, gotProfessionals.content.size)
+    }
+
+    @Test
+    fun `filter by absent state`() {
+        val state = EmploymentState.Available
+
+        val gotProfessional = professionalService.getProfessionals(
+            0, 10, ProfessionalFilters.empty().copy(
+                withoutState = listOf(state)
+            )
+        )
+
+        assertEquals(professionals.count { it.employmentState != state }, gotProfessional.content.size)
     }
 }

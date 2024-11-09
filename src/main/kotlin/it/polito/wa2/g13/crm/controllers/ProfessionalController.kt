@@ -26,14 +26,14 @@ class ProfessionalController(
     fun getProfessionals(
         @RequestParam("page") @Min(0) page: Int,
         @RequestParam("limit") @Min(0) @Max(10) limit: Int,
-        professionalFilters: ProfessionalFilters,
+        @Valid professionalFilters: ProfessionalFilters,
     ): Page<ProfessionalDTO> {
         return professionalService.getProfessionals(page, limit, professionalFilters)
     }
 
     @PostMapping("")
     fun createProfessional(
-        @RequestBody professional: CreateProfessionalDTO
+        @RequestBody @Valid professional: CreateProfessionalDTO
     ): ResponseEntity<ProfessionalDTO> {
         val newProfessional = professionalService.createProfessional(professional)
 

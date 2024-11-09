@@ -101,6 +101,27 @@ class Professional(
                     predicates.add(predicate)
                 }
 
+                // Filter by present states
+                if (filters.withState != null) {
+                    val predicate = professional.get<EmploymentState>("employmentState").`in`(
+                        filters.withState.toSet()
+                    )
+
+                    predicates.add(predicate)
+                }
+
+                // Filter by absent states
+                if (filters.withoutState != null) {
+                    val predicate = professional
+                        .get<EmploymentState>("employmentState")
+                        .`in`(
+                            filters.withoutState.toSet()
+                        )
+                        .not()
+
+                    predicates.add(predicate)
+                }
+
                 // Filter by location
                 if (filters.byLocation != null) {
                     val addressSubquery = query.subquery(Address::class.java)
