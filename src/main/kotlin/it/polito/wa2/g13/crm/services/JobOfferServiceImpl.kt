@@ -98,7 +98,6 @@ class JobOfferServiceImpl(
         val isTargetStateFeasible =
             JobOfferStateMachine(
                 jobOffer.status,
-                jobOffer.professional?.id
             ).isStatusFeasible(updateJobOfferStatusDTO.status, updateJobOfferStatusDTO.professionalId)
 
         if (!isTargetStateFeasible) {

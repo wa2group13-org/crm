@@ -3,7 +3,6 @@ package it.polito.wa2.g13.crm.data.joboffer
 
 class JobOfferStateMachine(
     private val currentStatus: JobOfferStatus,
-    private val currentProfessionalId: Long?,
 ) {
     fun isStatusFeasible(nextStatus: JobOfferStatus, nextProfessionalId: Long?): Boolean {
         return when (currentStatus) {
@@ -34,11 +33,11 @@ class JobOfferStateMachine(
 
             JobOfferStatus.Consolidated -> {
                 when (nextStatus) {
-                    JobOfferStatus.SelectionPhase -> nextProfessionalId == null
-                    JobOfferStatus.Done -> currentProfessionalId == nextProfessionalId
-                    JobOfferStatus.Aborted -> nextProfessionalId == null
+                    JobOfferStatus.SelectionPhase -> true
+                    JobOfferStatus.Done -> true
+                    JobOfferStatus.Aborted -> true
                     else -> false
-                }
+                } && nextProfessionalId == null
             }
 
             JobOfferStatus.Done -> {
