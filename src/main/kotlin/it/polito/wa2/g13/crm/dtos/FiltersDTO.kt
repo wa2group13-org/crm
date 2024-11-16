@@ -5,15 +5,15 @@ import jakarta.validation.Valid
 import jakarta.validation.constraints.Size
 
 data class LocationFilter(
-    @field:Size(min = 1, max = 255)
+    @field:Size(max = 255)
     val byCity: String?,
-    @field:Size(min = 1, max = 255)
+    @field:Size(max = 255)
     val byPostalCode: String?,
-    @field:Size(min = 1, max = 255)
+    @field:Size(max = 255)
     val byStreet: String?,
-    @field:Size(min = 1, max = 255)
+    @field:Size(max = 255)
     val byCivic: String?,
-    @field:Size(min = 1, max = 255)
+    @field:Size(max = 255)
     val byCountry: String?,
 )
 
@@ -24,7 +24,7 @@ data class ProfessionalFilters(
     val byEmploymentState: EmploymentState?,
     @field:Valid
     val byLocation: LocationFilter?,
-    @field:Size(min = 1, max = 255)
+    @field:Size(max = 255)
     val byFullName: String?,
     @field:Valid
     val withState: List<EmploymentState>?,
@@ -46,6 +46,6 @@ data class ProfessionalFilters(
 data class CustomerFilters(
     @field:Valid
     val byLocation: LocationFilter?,
-    @field:Size(min = 1, max = 255)
+    @field:Size(max = 255)
     val byFullName: String?,
 )
