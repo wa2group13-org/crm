@@ -360,7 +360,7 @@ class JobOfferServiceImplTest : IntegrationTest() {
     }
 
     @Test
-    fun `updating the status of a job offer from consolidated to done without the same professional should throw`() {
+    fun `updating the status of a job offer from consolidated to done without the same professional should succeed`() {
         val (jobOfferIds, _) = initCandidateProposalJobOffers(1)
         val professionalId = initProfessional(5).id
         val availableProfessionalId = initProfessional(5).id
@@ -374,16 +374,24 @@ class JobOfferServiceImplTest : IntegrationTest() {
         assertThrows<JobOfferException.ForbiddenTargetStatus> {
             jobOfferService.updateJobOfferStatus(
                 jobOfferIds[0],
-                UpdateJobOfferStatusDTO(JobOfferStatus.Done, availableProfessionalId, null)
+                UpdateJobOfferStatusDTO(JobOfferStatus.Done, professionalId, null)
             )
         }
 
         assertThrows<JobOfferException.ForbiddenTargetStatus> {
             jobOfferService.updateJobOfferStatus(
                 jobOfferIds[0],
-                UpdateJobOfferStatusDTO(JobOfferStatus.Done, null, null)
+                UpdateJobOfferStatusDTO(JobOfferStatus.Done, availableProfessionalId, null)
             )
         }
+
+        val newJobOffer = jobOfferService.updateJobOfferStatus(
+            jobOfferIds[0],
+            UpdateJobOfferStatusDTO(JobOfferStatus.Done, null, null)
+        )
+
+        assertEquals(newJobOffer.professionalId, null)
+        assertEquals(newJobOffer.status, JobOfferStatus.Done)
     }
 
     @Test
