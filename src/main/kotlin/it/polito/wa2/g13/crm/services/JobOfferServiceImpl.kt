@@ -111,7 +111,7 @@ class JobOfferServiceImpl(
         // Check that the professional is in Available state
         professional?.employmentState?.let {
             if (it != EmploymentState.Available && professional != jobOffer.professional) {
-                logger.error("Tried to assign ${Professional::class.qualifiedName}@${professional.id} to ${JobOffer::class.qualifiedName}@${jobOffer.id}, but it was already assigned!")
+                logger.error("Tried to assign ${Professional::class.qualifiedName}@${professional.id} to ${JobOffer::class.qualifiedName}@${jobOffer.id}, but it was already assigned to ${JobOffer::class.qualifiedName}@${professional.jobOffer?.id}!")
                 throw JobOfferException.IllegalProfessionalState.from(jobOffer.id, professional.id)
             }
         }

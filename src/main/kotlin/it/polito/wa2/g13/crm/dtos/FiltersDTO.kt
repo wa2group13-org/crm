@@ -20,7 +20,7 @@ data class LocationFilter(
 data class ProfessionalFilters(
     @field:Valid
     @field:Size(max = 100)
-    val bySkills: Set<String>?,
+    val bySkills: List<String>?,
     val byEmploymentState: EmploymentState?,
     @field:Valid
     val byLocation: LocationFilter?,

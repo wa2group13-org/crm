@@ -132,7 +132,7 @@ class ProfessionalServiceImplTest : IntegrationTest() {
 
         val gotProfessional = professionalService.getProfessionals(
             0, 10, ProfessionalFilters(
-                bySkills = professionalToFilter.skills.map { it.skill }.toSet(),
+                bySkills = professionalToFilter.skills.map { it.skill },
                 byEmploymentState = professionalToFilter.employmentState,
                 byFullName = null,
                 byLocation = LocationFilter(
@@ -158,7 +158,7 @@ class ProfessionalServiceImplTest : IntegrationTest() {
 
         val gotProfessional = professionalService.getProfessionals(
             0, 10, ProfessionalFilters(
-                bySkills = professionalToFilter.skills.map { it.skill }.toSet(),
+                bySkills = professionalToFilter.skills.map { it.skill },
                 byEmploymentState = professionalToFilter.employmentState,
                 byFullName = null,
                 byLocation = LocationFilter(

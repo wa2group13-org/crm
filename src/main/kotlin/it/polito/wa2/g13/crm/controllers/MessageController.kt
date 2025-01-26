@@ -7,6 +7,8 @@ import it.polito.wa2.g13.crm.services.MessageService
 import jakarta.validation.Valid
 import jakarta.validation.constraints.Min
 import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
+import org.springframework.data.web.PageableDefault
 import org.springframework.http.HttpStatus
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
@@ -78,6 +80,11 @@ class MessageController(
         @PathVariable mailId: String,
     ): MessageDTO {
         return messageService.getMessageByMailId(mailId)
+    }
+
+    @GetMapping("/contact/{contactId}")
+    fun getMessagesByContactId(@PathVariable contactId: Long, @PageableDefault pageable: Pageable): Page<MessageDTO> {
+        return messageService.getMessageByContactId(contactId, pageable)
     }
 }
 

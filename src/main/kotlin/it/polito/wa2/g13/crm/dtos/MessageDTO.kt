@@ -15,6 +15,7 @@ data class MessageDTO(
     val priority: Priority,
     val status: Status,
     val mailId: String?,
+    val contactId: Long,
 ) {
     companion object {
         @JvmStatic
@@ -29,6 +30,7 @@ data class MessageDTO(
                 priority = message.priority,
                 status = message.status,
                 mailId = message.mailId,
+                contactId = message.contact.id,
             )
         }
     }

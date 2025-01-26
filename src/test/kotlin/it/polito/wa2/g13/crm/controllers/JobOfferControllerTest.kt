@@ -340,6 +340,51 @@ class JobOfferControllerTest : IntegrationTest() {
             .ignoringFields("logTime")
             .isEqualTo(res.body)
     }
+
+    @Test
+    fun `assign job offer to a professional already assigned`() {
+        initJobOffers(2)
+        val id1 = jobOffers[0].id
+        val id2 = jobOffers[1].id
+        val p1 = professionalService.createProfessional(
+            randomProfessional(
+                0,
+                1
+            ).copy(
+                employmentState = EmploymentState.Available,
+                contactInfo = randomContacts(1, 1)[0].copy(category = ContactCategory.Unknown)
+            )
+        )
+
+
+        fun changeStatus(s: JobOfferStatus, id: Long, pId: Long? = null) {
+            val uri = "/API/joboffers/${id}"
+
+            val body = UpdateJobOfferStatusDTO(s, pId, "note")
+            val req = RequestEntity.post(uri)
+                .body(body, UpdateJobOfferStatusDTO::class.java)
+
+            val res = restClient.exchange<JobOfferDTO>(req)
+            assertTrue(res.statusCode.is2xxSuccessful)
+            assertEquals(res.body?.status, s)
+            assertEquals(res.body?.professionalId, pId)
+        }
+
+        changeStatus(JobOfferStatus.SelectionPhase, id1)
+        changeStatus(JobOfferStatus.CandidateProposal, id1)
+        changeStatus(JobOfferStatus.Consolidated, id1, p1.id)
+
+        changeStatus(JobOfferStatus.SelectionPhase, id2)
+        changeStatus(JobOfferStatus.CandidateProposal, id2)
+
+        val uri = "/API/joboffers/${id2}"
+        val body = UpdateJobOfferStatusDTO(JobOfferStatus.Consolidated, id2, "note")
+        val req = RequestEntity.post(uri)
+            .body(body, UpdateJobOfferStatusDTO::class.java)
+
+        val res = restClient.exchange<Any>(req)
+        assertTrue(res.statusCode.is4xxClientError)
+    }
 }
 
 
