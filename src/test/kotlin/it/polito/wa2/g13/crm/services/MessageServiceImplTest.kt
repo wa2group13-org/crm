@@ -188,12 +188,12 @@ class MessageServiceImplTest : IntegrationTest() {
         assertThat(history)
             .isNotNull()
             .hasSize(4) // Received, Read, Processing and Done
-            .usingRecursiveFieldByFieldElementComparatorIgnoringFields("messageId", "timestamp")
+            .usingRecursiveFieldByFieldElementComparatorIgnoringFields("id", "messageId", "timestamp")
             .containsExactlyInAnyOrder(
-                MessageActionsHistoryDTO(0, Status.Received, OffsetDateTime.now(), null),
-                MessageActionsHistoryDTO(0, Status.Read, OffsetDateTime.now(), "Reading message"),
-                MessageActionsHistoryDTO(0, Status.Processing, OffsetDateTime.now(), "Processing by HR"),
-                MessageActionsHistoryDTO(0, Status.Done, OffsetDateTime.now(), null),
+                MessageActionsHistoryDTO(0, 0, Status.Received, OffsetDateTime.now(), null),
+                MessageActionsHistoryDTO(0, 0, Status.Read, OffsetDateTime.now(), "Reading message"),
+                MessageActionsHistoryDTO(0, 0, Status.Processing, OffsetDateTime.now(), "Processing by HR"),
+                MessageActionsHistoryDTO(0, 0, Status.Done, OffsetDateTime.now(), null),
             )
     }
 
