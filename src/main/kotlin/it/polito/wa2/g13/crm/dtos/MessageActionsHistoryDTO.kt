@@ -5,19 +5,21 @@ import it.polito.wa2.g13.crm.data.message.Status
 import java.time.OffsetDateTime
 
 data class MessageActionsHistoryDTO(
-    var messageId: Long,
-    var status: Status,
-    var timestamp: OffsetDateTime,
-    var comment: String?,
+    val id: Long,
+    val messageId: Long,
+    val status: Status,
+    val timestamp: OffsetDateTime,
+    val comment: String?,
 ) {
     companion object {
         @JvmStatic
         fun from(messageActionsHistory: MessageActionsHistory): MessageActionsHistoryDTO {
             return MessageActionsHistoryDTO(
-                messageActionsHistory.message.id,
-                messageActionsHistory.status,
-                messageActionsHistory.timestamp,
-                messageActionsHistory.comment
+                id = messageActionsHistory.id,
+                messageId = messageActionsHistory.message.id,
+                status = messageActionsHistory.status,
+                timestamp = messageActionsHistory.timestamp,
+                comment = messageActionsHistory.comment
             )
         }
     }
