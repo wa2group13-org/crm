@@ -8,6 +8,7 @@ import it.polito.wa2.g13.crm.dtos.MessageDTO
 import it.polito.wa2.g13.crm.exceptions.MessageException
 import it.polito.wa2.g13.crm.repositories.SortBy
 import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 
 interface MessageService {
 
@@ -47,4 +48,6 @@ interface MessageService {
 
     @Throws(MessageException.NotFound::class)
     fun getMessageByMailId(mailId: String): MessageDTO
+
+    fun getMessageByContactId(contactId: Long, pageable: Pageable): Page<MessageDTO>
 }

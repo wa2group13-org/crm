@@ -1,6 +1,7 @@
 package it.polito.wa2.g13.crm.data.message
 
 import it.polito.wa2.g13.crm.data.BaseEntity
+import it.polito.wa2.g13.crm.data.contact.Contact
 import jakarta.persistence.*
 import org.springframework.data.jpa.repository.Temporal
 import java.time.OffsetDateTime
@@ -48,4 +49,7 @@ class Message(
     @Column(unique = true, updatable = false)
     var mailId: String?,
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(referencedColumnName = "id", name = "contact_id", foreignKey = ForeignKey())
+    var contact: Contact
 ) : BaseEntity()

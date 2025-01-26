@@ -11,31 +11,31 @@ import org.springframework.web.bind.annotation.RestControllerAdvice
 class JobOfferExceptionHandler {
     @ExceptionHandler(JobOfferException.NotFound::class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    fun jobOfferExceptionNotFound(e: JobOfferException.NotFound) = ProblemDetail
+    fun jobOfferExceptionNotFound(e: JobOfferException) = ProblemDetail
         .forStatusAndDetail(HttpStatus.NOT_FOUND, e.message)
 
     @ExceptionHandler(JobOfferException.ForbiddenTargetStatus::class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    fun jobOfferExceptionForbiddenTargetStatus(e: JobOfferException.ForbiddenTargetStatus) = ProblemDetail
+    fun jobOfferExceptionForbiddenTargetStatus(e: JobOfferException) = ProblemDetail
         .forStatusAndDetail(HttpStatus.BAD_REQUEST, e.message)
 
     @ExceptionHandler(JobOfferException.MissingProfessional::class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    fun jobOfferExceptionMissingProfessional(e: JobOfferException.MissingProfessional) = ProblemDetail
+    fun jobOfferExceptionMissingProfessional(e: JobOfferException) = ProblemDetail
         .forStatusAndDetail(HttpStatus.BAD_REQUEST, e.message)
 
     @ExceptionHandler(JobOfferException.NoteNotFound::class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    fun jobOfferExceptionNoteNotFound(e: JobOfferException.NoteNotFound) = ProblemDetail
+    fun jobOfferExceptionNoteNotFound(e: JobOfferException) = ProblemDetail
         .forStatusAndDetail(HttpStatus.NOT_FOUND, e.message)
 
     @ExceptionHandler(JobOfferException.TransitionStateError::class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    fun jobOfferExceptionTransitionStateError(e: JobOfferException.NotFound) = ProblemDetail
+    fun jobOfferExceptionTransitionStateError(e: JobOfferException) = ProblemDetail
         .forStatusAndDetail(HttpStatus.BAD_REQUEST, e.message)
 
     @ExceptionHandler(JobOfferException.IllegalProfessionalState::class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    fun jobOfferExceptionIllegalProfessionalState(e: JobOfferException.NotFound) = ProblemDetail
+    fun jobOfferExceptionIllegalProfessionalState(e: JobOfferException) = ProblemDetail
         .forStatusAndDetail(HttpStatus.BAD_REQUEST, e.message)
 }

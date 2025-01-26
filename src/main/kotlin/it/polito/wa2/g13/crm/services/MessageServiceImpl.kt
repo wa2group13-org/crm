@@ -6,6 +6,7 @@ import it.polito.wa2.g13.crm.data.message.*
 import it.polito.wa2.g13.crm.dtos.CreateMessageDTO
 import it.polito.wa2.g13.crm.dtos.MessageActionsHistoryDTO
 import it.polito.wa2.g13.crm.dtos.MessageDTO
+import it.polito.wa2.g13.crm.exceptions.ContactException
 import it.polito.wa2.g13.crm.exceptions.MessageException
 import it.polito.wa2.g13.crm.repositories.ContactRepository
 import it.polito.wa2.g13.crm.repositories.MessageActionsHistoryRepository
@@ -15,7 +16,9 @@ import it.polito.wa2.g13.crm.utils.nullable
 import org.slf4j.LoggerFactory
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
+import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Sort
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.OffsetDateTime
@@ -61,10 +64,13 @@ class MessageServiceImpl(
         /** find a previous message with the same sender and channel (if so, a contact already exists anonymous or not)
          * if a contact exists then a **/
         val previousMessage =
-            messageRepository.countAllBySenderAndChannel(createMessageDTO.sender, createMessageDTO.channel)
-        if (previousMessage == 0) {
+            messageRepository.findFirstBySenderAndChannel(createMessageDTO.sender, createMessageDTO.channel)
+
+        val messageContact = if (previousMessage == null) {
             val newContact = Contact.createAnonymous(createMessageDTO.sender, createMessageDTO.channel)
             contactRepository.save(newContact)
+        } else {
+            previousMessage.contact
         }
 
         val message = Message(
@@ -76,8 +82,12 @@ class MessageServiceImpl(
             priority = createMessageDTO.priority,
             status = Status.Received,
             history = mutableSetOf(),
-            mailId = createMessageDTO.mailId
+            mailId = createMessageDTO.mailId,
+            contact = messageContact,
         )
+
+        messageContact.messages.add(message)
+
         val logAction = MessageActionsHistory(message, message.status, message.date, null)
         message.history.add(logAction)
 
@@ -135,5 +145,12 @@ class MessageServiceImpl(
     override fun getMessageByMailId(mailId: String): MessageDTO {
         return messageRepository.findByMailId(mailId)?.let { MessageDTO.from(it) }
             ?: throw MessageException.NotFound("Message with mailId $mailId was not found")
+    }
+
+    override fun getMessageByContactId(contactId: Long, pageable: Pageable): Page<MessageDTO> {
+        return contactRepository.findByIdOrNull(contactId)
+            .let { it ?: throw ContactException.NotFound.from(contactId) }
+            .let { messageRepository.findByContact(it, pageable) }
+            .map { MessageDTO.from(it) }
     }
 }

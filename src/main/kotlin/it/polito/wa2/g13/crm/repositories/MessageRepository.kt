@@ -2,6 +2,7 @@ package it.polito.wa2.g13.crm.repositories
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies
 import com.fasterxml.jackson.databind.annotation.JsonNaming
+import it.polito.wa2.g13.crm.data.contact.Contact
 import it.polito.wa2.g13.crm.data.message.Message
 import it.polito.wa2.g13.crm.data.message.Status
 import org.springframework.data.domain.Page
@@ -23,7 +24,9 @@ enum class SortBy {
 interface MessageRepository : JpaRepository<Message, Long> {
     fun findAllByStatus(page: Pageable, status: Status): Page<Message>
 
-    fun countAllBySenderAndChannel(sender: String, channel: String): Int
+    fun findFirstBySenderAndChannel(sender: String, channel: String): Message?
 
     fun findByMailId(mailId: String): Message?
+
+    fun findByContact(contact: Contact, pageable: Pageable): Page<Message>
 }
