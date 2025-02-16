@@ -44,10 +44,10 @@ private class AllowedEnumValidator : ConstraintValidator<AllowedState, Employmen
 data class CreateProfessionalDTO(
     @field:DecimalMin("0.0")
     val dailyRate: Double,
-    @field:AllowedState(
-        allowed = [EmploymentState.Available, EmploymentState.NotAvailable],
-        message = "Invalid value. Only 'Available' and 'NotAvailable' are allowed."
-    )
+//    @field:AllowedState(
+//        allowed = [EmploymentState.Available, EmploymentState.NotAvailable],
+//        message = "Invalid value. Only 'Available' and 'NotAvailable' are allowed."
+//    )
     val employmentState: EmploymentState,
     @field:Size(max = 100, min = 1)
     @field:Valid
