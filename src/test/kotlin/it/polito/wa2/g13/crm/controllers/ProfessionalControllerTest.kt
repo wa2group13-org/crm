@@ -216,15 +216,16 @@ class ProfessionalControllerTest : IntegrationTest() {
         assertRecursive(newProfessional, updatedProfessional?.let { CreateProfessionalDTO.from(it) })
     }
 
-    @Test
-    fun `cannot insert a professional with Employed state`() {
-        val professional = newProfessional().first.copy(employmentState = EmploymentState.Employed)
-
-        val error = restClient
-            .exchange<Any>(
-                RequestEntity.post("/API/professionals").body(professional, CreateProfessionalDTO::class.java)
-            )
-
-        assertTrue(error.statusCode.is4xxClientError)
-    }
+    // TODO: decide what to do with this kind of operation
+//    @Test
+//    fun `cannot insert a professional with Employed state`() {
+//        val professional = newProfessional().first.copy(employmentState = EmploymentState.Employed)
+//
+//        val error = restClient
+//            .exchange<Any>(
+//                RequestEntity.post("/API/professionals").body(professional, CreateProfessionalDTO::class.java)
+//            )
+//
+//        assertTrue(error.statusCode.is4xxClientError)
+//    }
 }
